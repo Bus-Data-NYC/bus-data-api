@@ -11,7 +11,7 @@ An 	`credentials.json` file needs to be created locally in the root directory in
 {
   "host":     "www.example.com",
   "database": "db_name",
-  "username": "avg_joe",
+  "user": "avg_joe",
   "password": "foobar_pw",
   "s_token":  "abcd1234EFGH"
 }
