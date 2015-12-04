@@ -65,7 +65,24 @@ router.use(function(req, res, next) {
 	}
 });
 
-router.route("/routes/:route_id")	
+
+router.route("/routes")
+
+	.get(function (req, res) {
+		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
+						"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
+		handle_database(q, function (err, rows) {
+			if (err) {
+				res.status(404).send(err);
+			} else {
+				res.status(200).send(rows);
+			}
+		});
+	});
+
+
+router.route("/routes/:route_id")
+
 	.get(function (req, res) {
 		var route_id = req.params.route_id;
 		var return_obj;
@@ -115,9 +132,6 @@ router.route("/routes/:route_id")
 				}
 			}
 		});
-
-		// dump queries
-		q1 = q2 = q3 = q4 = null;
 	});
 
 
