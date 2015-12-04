@@ -8,28 +8,48 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 
-// attach to MySQL db
-var fs = require('fs');
-var credentials, mysql, connection;
-fs.readFile('credentials.json', 'utf8', function (err, data) {
-  if (err) throw err;
-  credentials = JSON.parse(data);
-	mysql = require('mysql');
-	connection = mysql.createConnection({
-	  host: credentials.host,
-	  user: credentials.user,
-	  password: credentials.password,
-	  database: credentials.database
+// attach to MySQL db and start server
+var fs = require("fs");
+var credentials, mysql, pool;
+fs.readFile("credentials.json", "utf8", function (err, data) {
+	if (err) throw err;
+	credentials = JSON.parse(data);
+
+	mysql = require("mysql");
+	pool = mysql.createPool({
+		connectionLimit: 100, //important
+		host: credentials.host,
+		user: credentials.user,
+		password: credentials.password,
+		database: credentials.database,
+		debug: false
 	});
 
-	connection.connect(function (err) {
-	if (err) {
-		throw err;
-	} else {
-	  startServer();
-	}
-	});
+	startServer();
 });
+
+
+
+
+
+function handle_database (query, cb) {
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			connection.release();
+			cb({"code" : 100, "status" : "Error in connection database"});
+		}
+		console.log("connected as id " + connection.threadId);
+		connection.query(query, function (err, rows) {
+			connection.release();
+			cb(err, rows);
+		});
+		connection.on("error", function (err) {      
+			cb({"code" : 100, "status" : "Error in connection database"});
+		});
+	});
+}
+
+
 
 
 var port = process.env.PORT || 8080; 
@@ -46,49 +66,34 @@ router.use(function(req, res, next) {
 	} else {
 		res.status(401).send("No key supplied.");
 	}
-    
 });
 
-router.route('/routes/:route_id')	
+router.route("/routes/:route_id")	
 	.get(function (req, res) {
 		var route_id = req.params.route_id;
 
-		var query = "";
+		var query = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
+								"FROM routes_current WHERE route_short_name = '" + route_id + "' LIMIT 1;";
 
-// SELECT agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color 
-// 	FROM routes 
-
-// INNER JOIN agency 
-// 	ON routes.agency_index = agency.agency_index 
-
-// WHERE routes.feed_index = (
-// 	SELECT MAX(feed_index) FROM routes 
-
-// 	WHERE feed_index >= (
-// 		SELECT MIN(feed_index) FROM feeds 
-// 		WHERE feed_start_date <= "2015-12-03" 
-// 			AND feed_end_date >= "2015-12-03"
-// 	)
-//     AND route_id = "BX1"
-// )
-
-// AND routes.route_id = "BX1";
-
-
-		connect.query()
-
-		res.status(200).send(route_id);
+		handle_database(query, function (err, rows) {
+			// connection.end();
+			if (err) {
+				res.status(404).send(err);
+			} else {
+				res.status(200).send(rows);
+			}
+		});
 	});
 
 
 // prefixed all restful routes with /api
-app.use('/api', router);
+app.use("/api", router);
 // END ROUTES
 
 
 // start server
 function startServer () {
 	app.listen(port);
-	console.log('bus-data-api now running on port ' + port);	
+	console.log("bus-data-api now running on port " + port);	
 };
 
