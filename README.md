@@ -23,3 +23,14 @@ This will allow access to the database that will be queried upon API calls.
 ### To-do (coming soon)
 
 Our goal for this repo is to create a wiki as well that will allow individuals to see how the API is structured and reference it for utilizing the API we deploy.
+
+
+### Note regarding event emitter warning
+
+After ten requests, Node will log the following:
+
+```
+(node) warning: possible EventEmitter memory leak detected. 11 error listeners added. Use emitter.setMaxListeners() to increase limit.
+```
+
+Don't worry about this as it's just a warning and has been "dealt" with already. Joyent has some back and forth on it in their Github issues and the warning will not affect performance.
