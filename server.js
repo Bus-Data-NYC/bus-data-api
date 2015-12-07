@@ -27,7 +27,14 @@ fs.readFile("credentials.json", "utf8", function (err, data) {
 		debug: false
 	});
 
-	startServer();
+	pool.getConnection(function (err, connection) {
+		connection.release();
+		if (err) {
+			console.log("Connection to MySQL server failed.");
+		} else {
+			startServer();
+		}
+	});
 });
 
 
@@ -103,28 +110,7 @@ router.route("/routes/:route_id")
 
 						} else {
 							return_obj["directions"] = rows.map(function (direction) { return direction.direction_name; });
-
-							var q3 =  "SELECT s.stop_id, s.stop_name, '' AS stop_desc, stop_lat, stop_lon " +
-												"FROM stops_current s, rds WHERE direction_id = 0 AND rds.stop_id = s.stop_id " +
-												"AND route_id = '" + route_id + "';";
-							handle_database(q3, function (err, rows) {
-								if (err) {
-									res.status(500).send(err);
-
-								} else {
-									return_obj["stops"] = [rows];
-
-									var q4 = q3.replace("direction_id = 0", "direction_id = 1");
-									handle_database(q4, function (err, rows) {
-										if (err) {
-											res.status(500).send(err);
-										} else {
-											return_obj["stops"].push(rows);
-											res.status(200).send(return_obj);
-										}
-									});
-								}
-							});
+							res.status(200).send(return_obj);
 						}
 					});
 				} else {
@@ -135,9 +121,79 @@ router.route("/routes/:route_id")
 	});
 
 
+router.route("/routes/:route_id/stops")
+
+	.get(function (req, res) {
+		var route_id = req.params.route_id;
+		var return_obj;
+
+		get_stops_by_route_direction(0, route_id, function (err, rows) {
+			if (err) {
+				res.status(500).send(err);
+
+			} else {
+				return_obj = [rows];
+
+				get_stops_by_route_direction(1, route_id, function (err, rows) {
+					if (err) {
+						res.status(500).send(err);
+					} else {
+						return_obj.push(rows);
+						res.status(200).send(return_obj);
+					}
+				});
+			}
+		});
+	});
+
+
+router.route("/routes/:route_id/stops/:direction_id")
+
+	.get(function (req, res) {
+		var route_id = req.params.route_id;
+		var direction_id = req.params.direction_id;
+
+		get_stops_by_route_direction(direction_id, route_id, function (err, rows) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				res.status(200).send(rows);
+			}
+		});
+	});
+
+
+router.route("/routes/:route_id/stops/:direction_id")
+
+	.get(function (req, res) {
+		var route_id = req.params.route_id;
+		var direction_id = req.params.direction_id;
+
+		get_stops_by_route_direction(direction_id, route_id, function (err, rows) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				res.status(200).send(rows);
+			}
+		});
+	});
+
+
 // prefixed all restful routes with /api
 app.use("/api", router);
 // END ROUTES
+
+
+// QUERY UTILITIES
+
+function get_stops_by_route_direction (direction_id, route_id, cb) {
+	var q =  "SELECT s.stop_id, s.stop_name, '' AS stop_desc, stop_lat, stop_lon " +
+						"FROM stops_current s, rds WHERE direction_id = " + direction_id + " AND rds.stop_id = s.stop_id " +
+						"AND route_id = '" + route_id + "';";
+	handle_database(q, function (err, rows) {
+		cb(err, rows);
+	});
+}
 
 
 // start server
