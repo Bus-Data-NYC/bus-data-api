@@ -163,13 +163,33 @@ router.route("/routes/:route_id/stops/:direction_id")
 	});
 
 
-router.route("/routes/:route_id/stops/:direction_id")
+router.route("/routes/:route_id/stops/:direction_id/:stop_id")
 
 	.get(function (req, res) {
 		var route_id = req.params.route_id;
 		var direction_id = req.params.direction_id;
+		var stop_id = req.params.stop_id;
+		var yyyymmdd = (new Date()).toISOString().slice(0,10).replace(/-/g,"");
 
-		get_stops_by_route_direction(direction_id, route_id, function (err, rows) {
+		get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				res.status(200).send(rows);
+			}
+		});
+	});
+
+
+router.route("/routes/:route_id/stops/:direction_id/:stop_id/date/:date")
+
+	.get(function (req, res) {
+		var route_id = req.params.route_id;
+		var direction_id = req.params.direction_id;
+		var stop_id = req.params.stop_id;
+		var yyyymmdd = req.params.date;
+
+		get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
 			if (err) {
 				res.status(500).send(err);
 			} else {
@@ -190,10 +210,21 @@ function get_stops_by_route_direction (direction_id, route_id, cb) {
 	var q =  "SELECT s.stop_id, s.stop_name, '' AS stop_desc, stop_lat, stop_lon " +
 						"FROM stops_current s, rds WHERE direction_id = " + direction_id + " AND rds.stop_id = s.stop_id " +
 						"AND route_id = '" + route_id + "';";
-	handle_database(q, function (err, rows) {
-		cb(err, rows);
-	});
-}
+	handle_database(q, function (err, rows) { cb(err, rows); });
+};
+
+function get_stop_data_by_day (yyyymmdd, stop_id, direction_id, route_id, cb) {
+	var q = "SELECT trip_id, trip_headsign, dep AS arrival_time, dep AS departure_time, stop_sequence, pickup_type, drop_off_type " +
+					"FROM (" + 
+						"SELECT IF(date_offset < 1, departure_time, SUBTIME(departure_time, '24:00:00')) " +
+							"AS dep, date_offset, trip_id, trip_headsign, stop_sequence, pickup_type, drop_off_type " +
+						"FROM date_trips dt, stop_times st, trips t " +
+							"WHERE date = '" + yyyymmdd + "' AND dt.route_id = '" + route_id + "' " + 
+								"AND dt.direction_id = '" + direction_id + "' AND st.stop_id = '" + stop_id + "'" +
+								"AND dt.trip_index = st.trip_index AND st.trip_index = t.trip_index" +
+					") AS x WHERE dep BETWEEN '-00:00:30' AND '23:59:29' ORDER BY dep;";
+	handle_database(q, function (err, rows) { cb(err, rows); });
+};
 
 
 // start server
@@ -201,4 +232,12 @@ function startServer () {
 	app.listen(port);
 	console.log("bus-data-api now running on port " + port);	
 };
+
+
+
+
+
+
+
+
 
