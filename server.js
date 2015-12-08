@@ -64,8 +64,16 @@ var router = express.Router();
 
 // middleware for all api requests, check for token
 router.use(function(req, res, next) {
+	var key, inHeader = false, asToken = false;
 	if (req.hasOwnProperty("headers") && req.headers.hasOwnProperty("key")) {
-		if (req.headers.key == "foobar") next();
+		inHeader = true;
+		key = req.headers.key;
+	} else if (req.hasOwnProperty("query") && req.query.hasOwnProperty("key")) {
+		asToken = true;
+		key = req.query.key;
+	}
+	if (inHeader || asToken) {
+		if (key == "foobar") next();
 		else res.status(401).send("Key not found.");
 	} else {
 		res.status(401).send("No key supplied.");
@@ -76,6 +84,7 @@ router.use(function(req, res, next) {
 router.route("/routes")
 
 	.get(function (req, res) {
+		console.log(req.params);
 		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
 						"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
 		handle_database(q, function (err, rows) {
