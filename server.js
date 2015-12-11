@@ -4,6 +4,7 @@ var app = express();
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname + '/bower_components'));
 
 var port = process.env.PORT || 8080; 
 
