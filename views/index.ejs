@@ -1,0 +1,78 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bus Transit Data</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+    	.bus-lapel {
+    		line-height: 3;
+    		padding: 10px;
+    		font-size: 1em;
+    		cursor: pointer;
+    	}
+    	.bus-lapel:not(:last-child) {
+    		margin-right: 5px;
+    	}
+    </style>
+
+  </head>
+  <body>
+
+  	<div class="container">
+  		
+  		<h1>Bus Data API</h1>
+  		<div id="routes">
+  			<% for (var key in routes) { %>
+  				<div class="panel panel-default">
+	  				<div class="panel-heading">
+	  					<b><%= key %><b>
+	  				</div>
+	  				<div class="panel-body">
+			  			<% for (var i = 0; i < routes[key].length; i++) { %>
+			   				<span class="label bus-lapel" 
+			  							id = "<%= routes[key][i].route_id %>"
+			  							style="background-color: #<%= routes[key][i].route_color %>;
+			  										color: #<%= routes[key][i].route_text_color %>;" 
+			  							api-route-boro="<%= key %>" 
+			  							api-route-desc="<%= routes[key][i].route_desc %>" 
+			  							api-agency-id="<%= routes[key][i].agency_id %>" 
+			  							api-route-url="<%= routes[key][i].route_url %>">
+			  					<%= routes[key][i].route_id %>
+			  				</span>
+			  			<% } %>
+		  			</div>
+		  			<div class="panel-footer" style="font-weight: 200"
+		  						id="panel_footer_<%= key %>">
+		  				Additional information appears here when you hover over a bus route.
+		  			</div>
+		  		</div>
+  			<% } %>
+  		</div>
+
+  	</div>
+
+  </body>
+	<script>
+		window.onload = function () {
+			$(".bus-lapel").hover(function (r) {
+				var boro = r.toElement.getAttribute("api-route-boro");
+				var desc = r.toElement.getAttribute("api-route-desc");
+				var agency_id = r.toElement.getAttribute("api-agency-id");
+				var route_url = r.toElement.getAttribute("api-route-url");
+
+				var blurb = [];
+				if (agency_id) blurb.push("Agency: " + agency_id);
+				if (desc) blurb.push("Route description: " + desc);
+				if (route_url) blurb.push("Route url: " + route_url);
+				$("#panel_footer_" + boro)[0].innerText = blurb.join("\n")
+			});
+		};
+	</script>
+</html>
+
+

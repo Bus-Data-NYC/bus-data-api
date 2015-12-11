@@ -1,6 +1,10 @@
 var express = require("express");
 var app = express();
 
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+app.use(express.static(__dirname + '/views'));
+
 var port = process.env.PORT || 8080; 
 
 
@@ -59,6 +63,31 @@ function handle_database (query, cb) {
 };
 
 
+// VIEWS
+app.get('/', function(req, res) {
+	get_routes_all(function (err, rows) {
+		if (err) {
+			res.status(404).send(err);
+		} else {
+			var routes = {};
+			rows.forEach(function (route) {
+				var boro = route.route_id.replace(/[0-9]/g, '');
+
+				if (boro.indexOf("BX") > -1) boro = "Bronx";
+				else if (boro.indexOf("M") > -1) boro = "Manhattan";
+				else if (boro.indexOf("Q") > -1) boro = "Queens";
+				else if (boro.indexOf("S") > -1) boro = "Staten Island";
+				else if (boro.indexOf("B") > -1) boro = "Brooklyn";
+				
+				if (routes[boro] == undefined) routes[boro] = [];
+				routes[boro].push(route);
+			});
+			res.render('index', {routes: routes});
+		}
+	});
+});
+
+
 // API ROUTES
 var router = express.Router(); 
 
@@ -84,10 +113,7 @@ router.use(function(req, res, next) {
 router.route("/routes")
 
 	.get(function (req, res) {
-		console.log(req.params);
-		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
-						"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
-		handle_database(q, function (err, rows) {
+		get_routes_all(function (err, rows) {
 			if (err) {
 				res.status(404).send(err);
 			} else {
@@ -214,6 +240,12 @@ app.use("/api", router);
 
 
 // QUERY UTILITIES
+
+function get_routes_all (cb) {
+	var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
+					"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
+	handle_database(q, cb);
+};
 
 function get_stops_by_route_direction (direction_id, route_id, cb) {
 	var q =  "SELECT s.stop_id, s.stop_name, '' AS stop_desc, stop_lat, stop_lon " +
