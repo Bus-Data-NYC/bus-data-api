@@ -1,0 +1,175 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bus Transit Data</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+    	.bus-lapel {
+    		line-height: 3;
+    		padding: 10px;
+    		font-size: 1em;
+    		cursor: pointer;
+    	}
+    	.bus-lapel:not(:last-child) {
+    		margin-right: 5px;
+    	}
+    	.twitter-typeahead {
+    		float: left;
+    		width: 100%;
+    	}
+			.tt-menu {
+			  width: 100px;
+			  padding: 8px 0;
+			  background-color: #fff;
+			  border: 1px solid #ccc;
+			  border: 1px solid rgba(0, 0, 0, 0.2);
+			  -webkit-border-radius: 3px;
+			     -moz-border-radius: 3px;
+			          border-radius: 3px;
+			  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			}
+			.tt-suggestion {
+			  padding: 3px 10px;
+			}
+			.tt-suggestion:hover {
+			  cursor: pointer;
+			  color: #fff;
+			  background-color: #0097cf;
+			}
+			.tt-suggestion.tt-cursor {
+			  color: #fff;
+			  background-color: #0097cf;
+			}
+			.tt-suggestion p {
+			  margin: 0;
+			}
+    </style>
+
+  </head>
+  <body>
+
+  	<div class="container" style="margin-top: 20px">
+  		
+  		<div class="row">
+	  		<div class="col-sm-4 col-xs-12">
+	  			<h1><b>Bus Data API</b></h1>
+	  		</div>
+
+				<div class="col-sm-8 col-xs-12">
+					<div class="input-group" id="routes_search">
+						<span class="input-group-addon" id="basic-addon3">
+							<span class="glyphicon glyphicon-search"></span>
+							Search for a route
+						</span>
+						<input type="text" class="form-control typeahead" placeholder="Search for...">
+						<span class="input-group-btn" >
+							<button class="btn btn-info" type="button">Get Route Data</button>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			
+  		<div id="routes">
+  			<h3>
+  				Browse all routes
+  				<small class="label label-success small pull-right" 
+  								style="color:#FFF; cursor: pointer; ">
+  					<span class="glyphicon glyphicon-th"></span>
+  					Developer Access
+  				</small>
+  			</h3>
+  			<% for (var key in routes) { %>
+  				<div class="panel panel-default">
+	  				<div class="panel-heading">
+	  					<b><%= key %><b>
+	  				</div>
+	  				<div class="panel-body">
+			  			<% for (var i = 0; i < routes[key].length; i++) { %>
+			   				<span class="label bus-lapel" 
+			  							id = "<%= routes[key][i].route_id %>"
+			  							style="background-color: #<%= routes[key][i].route_color %>;
+			  										color: #<%= routes[key][i].route_text_color %>;" 
+			  							api-route-boro="<%= key %>" 
+			  							api-route-desc="<%= routes[key][i].route_desc %>" 
+			  							api-agency-id="<%= routes[key][i].agency_id %>" 
+			  							api-route-url="<%= routes[key][i].route_url %>">
+			  					<%= routes[key][i].route_id %>
+			  				</span>
+			  			<% } %>
+		  			</div>
+		  			<div class="panel-footer" style="font-weight: 200;"
+		  						id="panel_footer_<%= key.replace(' ', '_') %>">
+		  				Additional information appears here when you hover over a bus route.
+		  			</div>
+		  		</div>
+	  		<% } %>
+	  	</div>
+
+  	</div>
+
+  	<center>
+	  	<p style="font-weight: 200;">
+	  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project.
+	  	</p>
+  	</center>
+
+  </body>
+	<script>
+		// Globals
+		var routes = [];
+
+		window.onload = function () {
+			$(".bus-lapel").each(function (r) {
+				r = $(".bus-lapel")[r];
+				routes.push(r.getAttribute("id"));
+			});
+			console.log(routes)
+			$(".bus-lapel").hover(function (r) {
+				try {
+					var boro = r.toElement.getAttribute("api-route-boro");
+					var desc = r.toElement.getAttribute("api-route-desc");
+					var agency_id = r.toElement.getAttribute("api-agency-id");
+					var route_url = r.toElement.getAttribute("api-route-url");
+
+					var blurb = [];
+					if (agency_id) blurb.push("Agency: " + agency_id);
+					if (desc) blurb.push("Route description: " + desc);
+					if (route_url) blurb.push("Route url: " + route_url);
+					$("#panel_footer_" + boro.replace(" ", "_"))[0].innerText = blurb.join("\n")
+				} catch (e) {}
+			});
+
+		$('#routes_search .typeahead')
+			.typeahead( {hint: true, highlight: true, minLength: 1}, 
+									{name: 'routes', source: substringMatcher(routes)});
+		};
+
+		// UTILITIES
+		var substringMatcher = function(strs) {
+		  return function findMatches(q, cb) {
+		    var matches = [];
+		    var substrRegex = new RegExp(q, 'i');
+		    $.each(strs, function(i, str) {
+		      if (substrRegex.test(str)) { matches.push(str); }
+		    });
+		    cb(matches);
+		  };
+		};
+
+
+
+
+	</script>
+</html>
+
+

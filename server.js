@@ -14,10 +14,12 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// bcrypt setup
+var bcrypt = require('bcryptjs');
 
 // attach to MySQL db and start server
 var fs = require("fs");
-var credentials, mysql, pool;
+var credentials, mysql, pool, sqlite3, usersDB;
 fs.readFile("credentials.json", "utf8", function (err, data) {
 	if (err) throw err;
 	credentials = JSON.parse(data);
@@ -37,6 +39,12 @@ fs.readFile("credentials.json", "utf8", function (err, data) {
 		if (err) {
 			console.log("Connection to MySQL server failed.");
 		} else {
+
+			// now attach to local sqlite3 user accounts
+			sqlite3 = require('sqlite3').verbose();
+			usersDB = new sqlite3.Database('database/users.db');
+			usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT)");
+
 			startServer();
 		}
 	});
@@ -84,6 +92,22 @@ app.get('/', function(req, res) {
 				routes[boro].push(route);
 			});
 			res.render('index', {routes: routes});
+		}
+	});
+});
+
+app.get('/developer/account/:email/:pw', function(req, res) {
+	var em = req.params.email;
+	var pw = req.params.pw;
+	var query = "SELECT * FROM users WHERE email = '" + em + "' and password = '" + pw + "';";
+	console.log(query);
+	usersDB.get(query, function (err, row) {
+		if (err) {
+			res.status(500).send(err);
+		} else if (row == undefined || row == []) {
+			res.redirect("/");
+		} else {
+			res.status(200).send("OK!")
 		}
 	});
 });
