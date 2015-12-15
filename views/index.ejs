@@ -16,29 +16,25 @@
     		padding: 10px;
     		font-size: 1em;
     		cursor: pointer;
-		    -webkit-transition: all 200ms ease-in;
-		    -webkit-transform: scale(1); 
-		    -ms-transition: all 200ms ease-in;
-		    -ms-transform: scale(1); 
-		    -moz-transition: all 200ms ease-in;
-		    -moz-transform: scale(1);
-		    transition: all 200ms ease-in;
-		    transform: scale(1);   
+		    -webkit-transition: all 200ms ease-o
+		    -ms-transition: all 200ms ease-out;
+		    -moz-transition: all 200ms ease-out;
+		    transition: all 200ms ease-out;
     	}
     	.bus-lapel:not(:last-child) {
     		margin-right: 5px;
     	}
 			.bus-lapel:hover {
 				box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
-		    -webkit-transition: all 200ms ease-in;
-		    -webkit-transform: scale(1.05);
-		    -ms-transition: all 200ms ease-in;
-		    -ms-transform: scale(1.05);   
-		    -moz-transition: all 200ms ease-in;
-		    -moz-transform: scale(1.05);
-		    transition: all 200ms ease-in;
-		    transform: scale(1.05);
+		    animation: pulse 2s ease infinite;
 			}
+
+			@keyframes pulse {
+			  0% { transform: scale(1); }
+			  50% { transform: scale(1.05); }
+			  100% { transform: scale(1); }
+			}
+
     	.twitter-typeahead {
     		float: left;
     		width: 100%;
@@ -195,6 +191,7 @@
 			if (rt == undefined) {
 				rt = $("#route-query")[0].value;
 			}
+			window.location.pathname = "/routes/" + rt;
 		};
 
 		function godevportal () {

@@ -59,7 +59,7 @@ function super_ops () {
 
 
 	// pool manager for mysql connections
-	function handle_database (query, cb) {
+	function handle_database (query, cb) {console.log(query);
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				connection.release();
@@ -103,10 +103,43 @@ function super_ops () {
 		});
 	});
 
+	app.get("/routes/:route_id", function (req, res) {
+		var route_id = req.params.route_id;
+		var return_obj;
+
+		get_specific_route(route_id, function (err, row) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				return_obj = row;
+
+				get_stops_by_route_direction(0, route_id, function (err, rows) {
+					if (err) {
+						res.status(500).send(err);
+
+					} else {
+						return_obj.stops = [rows];
+
+						get_stops_by_route_direction(1, route_id, function (err, rows) {
+							if (err) {
+								res.status(500).send(err);
+							} else {
+								return_obj.stops.push(rows);
+								res.status(200).render("routes", {route: return_obj});
+							}
+						});
+					}
+				});
+
+			}
+		});
+	});
+
 	app.get("/developer", function(req, res) {
 		res.status(200).render("developer_login");
 	});
 
+	// Account management
 	app.post("/developer/create", function(req, res) {
 		var em = String(req.body.email);
 		var pw = String(req.body.password);
@@ -119,8 +152,8 @@ function super_ops () {
 				if (row) {
 					res.status(200).send({is_dupe: true, token: null});
 				} else {
-					var q2 = "INSERT INTO users VALUES ('" + em + "', '" + pw + "', '" + tk + "');";
-					usersDB.run(q2, function (err) {
+					var q2 = "INSERT INTO users VALUES ('" + em + "', '" + pw + "', '" + tk + "', '" + Date.now() + "');";
+					usersDB.run(q2, function (err, row) {
 						if (err) {
 							res.status(500).send(err);
 						} else {
@@ -132,15 +165,13 @@ function super_ops () {
 		});
 	});
 
-	// Account management
 	app.post("/developer/new_token", function(req, res) {
 		var em = String(req.body.email);
 		var pw = String(req.body.password);
 		var tk = String(req.body.token);
 		var new_tk = uuid.v4();
 		var q = "UPDATE users SET token = '" + new_tk + "' WHERE email = '" + em + "' AND password = '" + pw + "';";
-		console.log(q)
-		usersDB.get(q, function (err, row) {
+		usersDB.run(q, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
 			} else {
@@ -172,7 +203,7 @@ function super_ops () {
 		var em = String(req.params.email);
 		var pw = String(req.params.password);
 		var query = "DELETE from users WHERE email = '" + em + "' AND password = '" + pw + "';";
-		usersDB.get(query, function (err, row) {
+		usersDB.run(query, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
 			} else {
@@ -189,7 +220,6 @@ function super_ops () {
 			if (err) {
 				res.status(500).send(err);
 			} else {
-				console.log("ok", row, query);
 				res.status(200).send(row)
 			}
 		});
@@ -201,19 +231,36 @@ function super_ops () {
 
 	// middleware for all api requests, check for token
 	router.use(function(req, res, next) {
-		var key, inHeader = false, asToken = false;
-		if (req.hasOwnProperty("headers") && req.headers.hasOwnProperty("key")) {
+		var token, inHeader = false, asToken = false;
+		if (req.hasOwnProperty("headers") && req.headers.hasOwnProperty("token")) {
 			inHeader = true;
-			key = req.headers.key;
-		} else if (req.hasOwnProperty("query") && req.query.hasOwnProperty("key")) {
+			token = req.headers.token;
+		} else if (req.hasOwnProperty("query") && req.query.hasOwnProperty("token")) {
 			asToken = true;
-			key = req.query.key;
+			token = req.query.token;
 		}
 		if (inHeader || asToken) {
-			if (key == "foobar") next();
-			else res.status(401).send("Key not found.");
+			var q1 = "SELECT * FROM users WHERE token = '" + token + "';";
+			usersDB.get(q1, function (err, row) {
+				if (err) {
+					res.status(500).send(err);
+				} else {
+					if (row) {
+						var q2 = "UPDATE users SET last_req = '" + Date.now() + "' WHERE token = '" + token + "';"
+						usersDB.run(q2, function (err, row) {
+							if (err) {
+								res.status(500).send(err);
+							} else {
+								next();
+							}
+						});
+					} else {
+						res.status(404).send("Token not found.");
+					}
+				}
+			});
 		} else {
-			res.status(401).send("No key supplied.");
+			res.status(401).send("No token supplied.");
 		}
 	});
 
@@ -237,28 +284,11 @@ function super_ops () {
 			var route_id = req.params.route_id;
 			var return_obj;
 
-			var q1 =  "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
-								"FROM routes_current WHERE route_short_name = '" + route_id + "' LIMIT 1;";
-			handle_database(q1, function (err, rows) {
+			get_specific_route(route_id, function (err, rows) {
 				if (err) {
-					res.status(404).send(err);
+					res.status(500).send(err);
 				} else {
-					return_obj = rows[0];
-
-					if (rows.length > 0) {
-						var q2 = "SELECT direction_id, direction_name FROM directions WHERE route_id = '" + route_id + "' LIMIT 2;";
-						handle_database(q2, function (err, rows) {
-							if (err) {
-								res.status(500).send(err);
-
-							} else {
-								return_obj["directions"] = rows.map(function (direction) { return direction.direction_name; });
-								res.status(200).send(return_obj);
-							}
-						});
-					} else {
-						res.status(200).send(return_obj);
-					}
+					res.status(200).send(return_obj);
 				}
 			});
 		});
@@ -353,6 +383,31 @@ function super_ops () {
 		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
 						"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
 		handle_database(q, cb);
+	};
+
+	function get_specific_route (route_id, cb) {
+		var q1 =  "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
+							"FROM routes_current WHERE route_short_name = '" + route_id + "' LIMIT 1;";
+		handle_database(q1, function (err, rows) {
+			if (err) {
+				cb(err, null);
+			} else {
+				if (rows.length > 0) {
+					var return_obj = rows[0];
+					var q2 = "SELECT direction_id, direction_name FROM directions WHERE route_id = '" + route_id + "' LIMIT 2;";
+					handle_database(q2, function (err, rows) {
+						if (err) {
+							cb(err, null);
+						} else {
+							return_obj["directions"] = rows.map(function (direction) { return direction.direction_name; });
+							cb(err, return_obj);
+						}
+					});
+				} else {
+					cb({"error": "No route for that id."}, null);
+				}
+			}
+		});
 	};
 
 	function get_stops_by_route_direction (direction_id, route_id, cb) {

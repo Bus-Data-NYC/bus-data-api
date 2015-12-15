@@ -1,0 +1,73 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Bus Transit Data</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+
+    </style>
+
+  </head>
+  <body>
+
+  	<div class="container" style="margin-top: 20px">
+  		
+  		<a class="pull-right btn btn-default" href="/"><i class="glyphicon glyphicon-home"></i> Home</a>
+
+  		<h1>
+  			<b>Bus Data API</b> <span style="color:grey;font-weight:100">
+  				<% if (route.route_short_name !== "") { %>
+  					<%= route.route_short_name %>
+  				<% } else { %>
+  					<%= route.route_id %>
+  				<% } %> Route Explorer
+  			</span>
+
+  			<br>
+  			<small>
+  				<sub>
+  					<span class="glyphicon glyphicon-stop" style="color:#<%= route.route_color %>"></span> 
+  					<%= route.agency_id %> <%= route.route_long_name %> <%= route.route_desc %> 
+  					<a href="<%= route.route_url %>" style="font-size:x-small">
+  						(MTA Page)
+  					</a>
+  				</sub>
+  			</small>
+  		</h1>
+
+			
+  		<div id="stops">
+
+  		<% for (var d = 0; d < route.stops.length; d++) { %>
+  			<ul style="float:left">
+  				<h5><%= route.directions[d] %> Direction</h5>
+  				<% for (var i = 0; i < route.stops[d].length; i++) { %>
+  					<li style="list-style-type:none">
+  						<%= route.stops[d][i].stop_name %>
+  					</li>
+  				<% } %>
+  			</ul>
+  		<% } %>
+
+	  	</div>
+
+  	</div>
+
+  </body>
+	<script>
+		// Globals
+		var routes = [];
+
+
+
+	</script>
+</html>
+
+
