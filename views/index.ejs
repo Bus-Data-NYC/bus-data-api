@@ -16,10 +16,29 @@
     		padding: 10px;
     		font-size: 1em;
     		cursor: pointer;
+		    -webkit-transition: all 200ms ease-in;
+		    -webkit-transform: scale(1); 
+		    -ms-transition: all 200ms ease-in;
+		    -ms-transform: scale(1); 
+		    -moz-transition: all 200ms ease-in;
+		    -moz-transform: scale(1);
+		    transition: all 200ms ease-in;
+		    transform: scale(1);   
     	}
     	.bus-lapel:not(:last-child) {
     		margin-right: 5px;
     	}
+			.bus-lapel:hover {
+				box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+		    -webkit-transition: all 200ms ease-in;
+		    -webkit-transform: scale(1.05);
+		    -ms-transition: all 200ms ease-in;
+		    -ms-transform: scale(1.05);   
+		    -moz-transition: all 200ms ease-in;
+		    -moz-transform: scale(1.05);
+		    transition: all 200ms ease-in;
+		    transform: scale(1.05);
+			}
     	.twitter-typeahead {
     		float: left;
     		width: 100%;
@@ -66,13 +85,17 @@
 
 				<div class="col-sm-8 col-xs-12">
 					<div class="input-group" id="routes_search">
-						<span class="input-group-addon" id="basic-addon3">
+						<span class="input-group-addon">
 							<span class="glyphicon glyphicon-search"></span>
 							Search for a route
 						</span>
-						<input type="text" class="form-control typeahead" placeholder="Search for...">
+						<input type="text" class="form-control typeahead" 
+										id="route-query" placeholder="Search for...">
 						<span class="input-group-btn" >
-							<button class="btn btn-info" type="button">Get Route Data</button>
+							<button class="btn btn-info" type="button"
+												onclick="gotoroute()">
+								Get Route Data
+							</button>
 						</span>
 					</div>
 				</div>
@@ -83,7 +106,8 @@
   			<h3>
   				Browse all routes
   				<small class="label label-success small pull-right" 
-  								style="color:#FFF; cursor: pointer; ">
+  								style="color:#FFF; cursor: pointer;"
+  								onclick="godevportal()">
   					<span class="glyphicon glyphicon-th"></span>
   					Developer Access
   				</small>
@@ -99,6 +123,7 @@
 			  							id = "<%= routes[key][i].route_id %>"
 			  							style="background-color: #<%= routes[key][i].route_color %>;
 			  										color: #<%= routes[key][i].route_text_color %>;" 
+			  							onclick="gotoroute('<%= routes[key][i].route_id %>')"
 			  							api-route-boro="<%= key %>" 
 			  							api-route-desc="<%= routes[key][i].route_desc %>" 
 			  							api-agency-id="<%= routes[key][i].agency_id %>" 
@@ -133,7 +158,7 @@
 				r = $(".bus-lapel")[r];
 				routes.push(r.getAttribute("id"));
 			});
-			console.log(routes)
+
 			$(".bus-lapel").hover(function (r) {
 				try {
 					var boro = r.toElement.getAttribute("api-route-boro");
@@ -166,6 +191,15 @@
 		  };
 		};
 
+		function gotoroute (rt) {
+			if (rt == undefined) {
+				rt = $("#route-query")[0].value;
+			}
+		};
+
+		function godevportal () {
+			window.location.pathname = "/developer";
+		};
 
 
 

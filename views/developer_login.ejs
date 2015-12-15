@@ -11,159 +11,224 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
-    	.bus-lapel {
-    		line-height: 3;
-    		padding: 10px;
-    		font-size: 1em;
-    		cursor: pointer;
-    	}
-    	.bus-lapel:not(:last-child) {
-    		margin-right: 5px;
-    	}
-    	.twitter-typeahead {
-    		float: left;
-    		width: 100%;
-    	}
-			.tt-menu {
-			  width: 100px;
-			  padding: 8px 0;
-			  background-color: #fff;
-			  border: 1px solid #ccc;
-			  border: 1px solid rgba(0, 0, 0, 0.2);
-			  -webkit-border-radius: 3px;
-			     -moz-border-radius: 3px;
-			          border-radius: 3px;
-			  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-			     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
-			          box-shadow: 0 5px 10px rgba(0,0,0,.2);
-			}
-			.tt-suggestion {
-			  padding: 3px 10px;
-			}
-			.tt-suggestion:hover {
-			  cursor: pointer;
-			  color: #fff;
-			  background-color: #0097cf;
-			}
-			.tt-suggestion.tt-cursor {
-			  color: #fff;
-			  background-color: #0097cf;
-			}
-			.tt-suggestion p {
-			  margin: 0;
-			}
+
     </style>
 
   </head>
   <body>
 
   	<div class="container" style="margin-top: 20px">
-  		
-  		<div class="row">
-	  		<div class="col-sm-4 col-xs-12">
-	  			<h1><b>Bus Data API</b></h1>
-	  		</div>
 
-				<div class="col-sm-8 col-xs-12">
-					<div class="input-group" id="routes_search">
-						<span class="input-group-addon" id="basic-addon3">
-							<span class="glyphicon glyphicon-search"></span>
-							Search for a route
-						</span>
-						<input type="text" class="form-control typeahead" placeholder="Search for...">
-						<span class="input-group-btn" >
-							<button class="btn btn-info" type="button">Get Route Data</button>
-						</span>
+  		<button class="pull-right btn btn-default" onclick="gohome()"><i class="glyphicon glyphicon-chevron-left"></i> Back</button>
+  		
+  		<h1><b>Bus Data API</b> <span style="color:grey;font-weight:100">Developer Portal</span></h1>
+
+	  	<div class="form-entries">
+
+				<form class="panel panel-default" id="signin">
+					<div class="panel-heading">
+						<b>Sign In</b>
 					</div>
-				</div>
+					<div class="panel-body">
+					  <br>Email:
+					  <input type="text" id="sign_in_email">
+					  Password:
+					  <input type="text" id="sign_in_pw">
+					  <input class="btn btn-default" type="submit" value="Sign In">
+					</div>
+				</form>
+				
+				<br>
+
+				<form class="panel panel-default" id="signup">
+					<div class="panel-heading">
+						<b>Sign Up</b>
+					</div>
+					<div class="panel-body">
+					  <br>Email:
+					  <input type="text" id="sign_up_email">
+					  Password:
+					  <input type="text" id="sign_up_pw1">
+					  Password (re-enter):
+					  <input type="text" id="sign_up_pw2">
+					  <input class="btn btn-default" type="submit" value="Sign Up">
+					</div>
+				</form>
+
+				<br>
+
+				<form class="panel panel-default" id="forgot_pw">
+					<div class="panel-heading">
+						<b>Get your password if you forgot it</b>
+					</div>
+					<div class="panel-body">
+					  <br>Enter the email address associated with the account:
+					  <input type="text" id="forgot_pw_email">
+					  <input class="btn btn-default" type="submit" value="Send password to account">
+					</div>
+				</form>
+
 			</div>
 
-			
-  		<div id="routes">
-  			<h3>
-  				Browse all routes
-  				<small class="label label-success small pull-right" 
-  								style="color:#FFF; cursor: pointer; ">
-  					<span class="glyphicon glyphicon-th"></span>
-  					Developer Access
-  				</small>
-  			</h3>
-  			<% for (var key in routes) { %>
-  				<div class="panel panel-default">
-	  				<div class="panel-heading">
-	  					<b><%= key %><b>
-	  				</div>
-	  				<div class="panel-body">
-			  			<% for (var i = 0; i < routes[key].length; i++) { %>
-			   				<span class="label bus-lapel" 
-			  							id = "<%= routes[key][i].route_id %>"
-			  							style="background-color: #<%= routes[key][i].route_color %>;
-			  										color: #<%= routes[key][i].route_text_color %>;" 
-			  							api-route-boro="<%= key %>" 
-			  							api-route-desc="<%= routes[key][i].route_desc %>" 
-			  							api-agency-id="<%= routes[key][i].agency_id %>" 
-			  							api-route-url="<%= routes[key][i].route_url %>">
-			  					<%= routes[key][i].route_id %>
-			  				</span>
-			  			<% } %>
-		  			</div>
-		  			<div class="panel-footer" style="font-weight: 200;"
-		  						id="panel_footer_<%= key.replace(' ', '_') %>">
-		  				Additional information appears here when you hover over a bus route.
-		  			</div>
-		  		</div>
-	  		<% } %>
-	  	</div>
+			<div class="login-success" style="display:none">
+				<p>
+					Hello, <span id="user-email"></span>.
+					<br>Your password is <span id="user-password"></span>.
+					<br>Your token is <span id="user-token"></span>.
+				</p>
+
+				<!-- New token success -->
+				<span id="new_token_success" style="display:none">
+					<i>New token has been created. Re-login to ensure token was properly generated.</i>
+					<br><br>
+				</span>
+
+				<button class="btn btn-xs btn-warning" onclick="newToken()">
+					Get new token
+				</button>
+
+				<button class="btn btn-xs btn-danger" onclick="deleteUser()">
+					Delete this account
+				</button>
+
+			</div>
 
   	</div>
-
-  	<center>
-	  	<p style="font-weight: 200;">
-	  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project.
-	  	</p>
-  	</center>
 
   </body>
 	<script>
 		// Globals
 		var routes = [];
 
-		window.onload = function () {
-			$(".bus-lapel").each(function (r) {
-				r = $(".bus-lapel")[r];
-				routes.push(r.getAttribute("id"));
-			});
-			console.log(routes)
-			$(".bus-lapel").hover(function (r) {
-				try {
-					var boro = r.toElement.getAttribute("api-route-boro");
-					var desc = r.toElement.getAttribute("api-route-desc");
-					var agency_id = r.toElement.getAttribute("api-agency-id");
-					var route_url = r.toElement.getAttribute("api-route-url");
 
-					var blurb = [];
-					if (agency_id) blurb.push("Agency: " + agency_id);
-					if (desc) blurb.push("Route description: " + desc);
-					if (route_url) blurb.push("Route url: " + route_url);
-					$("#panel_footer_" + boro.replace(" ", "_"))[0].innerText = blurb.join("\n")
-				} catch (e) {}
-			});
-
-		$('#routes_search .typeahead')
-			.typeahead( {hint: true, highlight: true, minLength: 1}, 
-									{name: 'routes', source: substringMatcher(routes)});
-		};
 
 		// UTILITIES
-		var substringMatcher = function(strs) {
-		  return function findMatches(q, cb) {
-		    var matches = [];
-		    var substrRegex = new RegExp(q, 'i');
-		    $.each(strs, function(i, str) {
-		      if (substrRegex.test(str)) { matches.push(str); }
-		    });
-		    cb(matches);
-		  };
+		function isEmail (email) {
+	    var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	    return re.test(email);
+		};
+
+		function deleteUser () {
+	  	var em = $("#user-email")[0].innerText;
+	  	var pw = $("#user-password")[0].innerText;
+	  	var address = "/developer/account/" + em + "/" + pw;
+			$.ajax({
+			  url: address,
+			  type: "DELETE",
+			  success: function () {
+			  	window.location.pathname = "/";
+			  },
+			  error: function () {
+			  	alert("Something happened, account was not deleted.");
+			  }
+			});
+		};	
+
+		function newToken () {
+	  	var em = $("#user-email")[0].innerText;
+	  	var tk = $("#user-token")[0].innerText;
+	  	var pw = $("#user-password")[0].innerText;
+	  	$.post("/developer/new_token/", {email: em, password: pw, token: tk})
+				.done(function (token) {
+				  if (token) {
+				  	$("#user-token")[0].innerHTML = "updated. New token is <b>" + token + "</b>";
+				  	$("#new_token_success").fadeOut();
+				  	$("#new_token_success").fadeIn();
+				  } else {
+				  	alert("Something happened. Try again.")
+				  }
+				})
+				.fail(function(error) {
+				  console.log(error);
+				});;
+		};
+
+		$("#forgot_pw").submit(function (event) {
+			event.preventDefault();
+			var email = $("#forgot_pw #forgot_pw_email")[0].value;
+			var address = "/developer/email_pw/" + email;
+			$.get(address)
+				.done(function (data) {
+					if (data.email) {
+						alert("Email has been sent to " + data.email + ". Check email to access account with password.");
+					} else {
+						alert("An account with that email does not exist in our system.")
+					}
+				})
+				.fail(function(error) {
+				  console.log(error);
+				});
+		});
+
+		$("#signin").submit(function (event) {
+		  event.preventDefault();
+		  var email = $("#signin #sign_in_email")[0].value;
+		  var password = $("#signin #sign_in_pw")[0].value;
+		  if (email == "" || password == "") {
+		  	alert("Email or password not entered. Please enter and retry.");
+		  } else {
+		  	var address = "/developer/account/" + email + "/" + password;
+		  	$.get(address)
+					.done(function(data) {
+					  if (data) {
+					  	console.log("S", data);
+					  	$(".form-entries").hide();
+					  	$("#user-email")[0].innerText = data.email;
+					  	$("#user-token")[0].innerText = data.token;
+					  	$("#user-password")[0].innerText = data.password;
+					  	$(".login-success").show();
+					  } else {
+					  	console.log("data", data);
+					  	alert("Email or password was incorrect. Try again.")
+					  }
+					})
+					.fail(function(error) {
+					  console.log(error);
+					});
+
+		  }
+		});
+
+
+		$("#signup").submit(function (event) {
+		  event.preventDefault();
+
+		  var email = $("#signup #sign_up_email")[0].value;
+		  var pw1 = $("#signup #sign_up_pw1")[0].value;
+		  var pw2 = $("#signup #sign_up_pw2")[0].value;
+
+		  if (email == "" || pw1 == "" || pw2 == "") {
+		  	alert("Email or password not entered. Please enter and retry.");
+		  } else if (pw1 !== pw2) {
+		  	alert("Password entries do not match. Try again.")
+		  } else if (!isEmail(email)) {
+		  	alert("Not a valid email address. Try again.")
+		  } else {
+		  	$.post("/developer/create/", {email: email, password: pw1})
+					.done(function(data) {
+					  if (data) {
+					  	if (data.is_dupe) {
+					  		alert("Email address already in use, try a different one.")
+					  	} else {
+						  	$(".form-entries").hide();
+						  	$("#user-email")[0].innerText = email;
+						  	$("#user-token")[0].innerText = data.token;
+						  	$("#user-password")[0].innerText = pw1;
+						  	$(".login-success").show();
+					  	}
+					  } else {
+					  	alert("Something happened. Try again.")
+					  }
+					})
+					.fail(function(error) {
+					  console.log(error);
+					});
+
+		  }
+		});
+
+		function gohome () {
+			window.location.pathname = "/";
 		};
 
 
