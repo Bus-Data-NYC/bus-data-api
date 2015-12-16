@@ -56,13 +56,22 @@
 	  					<% if (route.stop_times[i].length < 1) { %>
 	  						<td>&nbsp;&ndash;</td>
 	  					<% } else { %>
-	  						<td><%= route.stop_times[i] %></td>
+	  						<td>
+	  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
+	  								<% if (route.stop_times[i][t][1] == "D") { %>
+	  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+	  								<% } else { %>
+	  									<span style="text-decoration:underline">
+	  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+	  									</span>
+	  								<% } %>
+	  							<% } %>
+	  						</td>
 	  					<% } %>
 	  				</tr>
 	  			<% } %>
 	  		</table>
 
-<%= Object.keys(route.stop_times) %>
 
 
 	  	</div>
