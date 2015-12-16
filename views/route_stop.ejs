@@ -46,35 +46,69 @@
   		</h1>
 
 			
-  		<div id="stops">
+  		<div class="row">
+				<div class="col-sm-6 col-xs-12">
+					<div class="panel panel-default">
+					  <div class="panel-heading">
+					  	Scheduled
+					  </div>
 
-	  		<table>
-	  			<caption>Scheduled</caption>
-	  			<% for (var i = 0; i < 24; i++) { %>
-	  				<tr>
-	  					<td><b><%= i %>: </b></td>
-	  					<% if (route.stop_times[i].length < 1) { %>
-	  						<td>&nbsp;&ndash;</td>
-	  					<% } else { %>
-	  						<td>
-	  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
-	  								<% if (route.stop_times[i][t][1] == "D") { %>
-	  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
-	  								<% } else { %>
-	  									<span style="text-decoration:underline">
-	  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
-	  									</span>
-	  								<% } %>
-	  							<% } %>
-	  						</td>
-	  					<% } %>
-	  				</tr>
-	  			<% } %>
-	  		</table>
+			  		<table class="table">
+			  			<% for (var i = 0; i < 24; i++) { %>
+			  				<tr>
+			  					<td><b><%= i %>: </b></td>
+			  					<% if (route.stop_times[i].length < 1) { %>
+			  						<td>&nbsp;&ndash;</td>
+			  					<% } else { %>
+			  						<td>
+			  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
+			  								<% if (route.stop_times[i][t][1] == "D") { %>
+			  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+			  								<% } else { %>
+			  									<span style="text-decoration:underline">
+			  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+			  									</span>
+			  								<% } %>
+			  							<% } %>
+			  						</td>
+			  					<% } %>
+			  				</tr>
+			  			<% } %>
+			  		</table>
+					</div>
+				</div>
 
+				<div class="col-sm-6 col-xs-12">
+					<div class="panel panel-default">
+					  <div class="panel-heading">
+					  	Scheduled
+					  </div>
 
-
-	  	</div>
+			  		<table class="table">
+			  			<% for (var i = 0; i < 24; i++) { %>
+			  				<tr>
+			  					<td><b><%= i %>: </b></td>
+			  					<% if (route.stop_times[i].length < 1) { %>
+			  						<td>&nbsp;&ndash;</td>
+			  					<% } else { %>
+			  						<td>
+			  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
+			  								<% if (route.stop_times[i][t][1] == "D") { %>
+			  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+			  								<% } else { %>
+			  									<span style="text-decoration:underline">
+			  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
+			  									</span>
+			  								<% } %>
+			  							<% } %>
+			  						</td>
+			  					<% } %>
+			  				</tr>
+			  			<% } %>
+			  		</table>
+					</div>
+		  	</div>
+		  </div>
 
   	</div>
 

@@ -42,7 +42,7 @@ function super_ops () {
 		});
 
 		pool.getConnection(function (err, connection) {
-			connection.release();
+			try { connection.release(); } catch (e) { console.log("Error on connection release: ", e) }
 			if (err) {
 				console.log("Connection to MySQL server failed.");
 			} else {

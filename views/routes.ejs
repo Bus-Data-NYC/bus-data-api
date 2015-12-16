@@ -7,19 +7,21 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
 
     <style type="text/css">
-
+    .leaflet-popup-content-wrapper {
+    	border-radius: 3px;
+    }
     </style>
 
   </head>
   <body>
 
   	<div class="container" style="margin-top: 20px">
-  		
-  		<a class="pull-right btn btn-default" href="/"><i class="glyphicon glyphicon-home"></i> Home</a>
 
   		<h1>
   			<b onclick="gohome()" style="cursor:pointer">
@@ -45,32 +47,60 @@
   			</small>
   		</h1>
 
+  		<div id="map" style="height:300px;background-color:#<%= route.route_color %>">
+  		</div>
 			
   		<div id="stops">
-
-  		<% for (var d = 0; d < route.stops.length; d++) { %>
-  			<ul style="float:left">
-  				<h5><%= route.directions[d] %> Direction</h5>
-  				<% for (var i = 0; i < route.stops[d].length; i++) { %>
-  					<li style="list-style-type:none">
-  						<a href="/routes/<%= route.route_id %>/<%= d %>/<%= route.stops[d][i].stop_id %>"><%= route.stops[d][i].stop_name %></a>
-  					</li>
-  				<% } %>
-  			</ul>
-  		<% } %>
-
+  			<h4>Explore Individual Stops</h4>
+	  		<% for (var d = 0; d < route.stops.length; d++) { %>
+	  			<ul style="float:left">
+	  				<h5><%= route.directions[d] %> Direction</h5>
+	  				<% for (var i = 0; i < route.stops[d].length; i++) { %>
+	  					<li style="list-style-type:none">
+	  						<a href="/routes/<%= route.route_id %>/<%= d %>/<%= route.stops[d][i].stop_id %>"><%= route.stops[d][i].stop_name %></a>
+	  					</li>
+	  				<% } %>
+	  			</ul>
+	  		<% } %>
 	  	</div>
 
   	</div>
 
   </body>
 	<script>
+		String.prototype.replaceAll = function(search, replace) {
+			if (replace === undefined) { return this.toString(); } 
+			else { return this.split(search).join(replace); }
+		};
+
 		// Globals
+		var stops = "<%= JSON.stringify(route.stops) %>";
+		stops = JSON.parse(stops.replaceAll("&#34;", '"'));
+
+		var map = L.map('map', {zoomControl:false, attributionControl:false}).setView([40.75, -73.85], 10);
+		map.addControl( L.control.zoom({position: 'topright'}) );
+		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+
+		var all_stops = [];
+		stops.forEach(function (dir) {
+			dir.forEach(function (stop) {
+				var m = L.circle([stop.stop_lat, stop.stop_lon], 15, {color: "#<%= route.route_color %>", fillOpacity: 1 });
+				m.bindPopup("<span onclick='gotostop(" + stop.stop_id.toString() + ")' style='cursor:pointer'>" + 
+										stop.stop_name + "</span>", {closeButton:false});
+				all_stops.push(m);
+				m.addTo(map);
+			});
+		});
+		all_stops = L.featureGroup(all_stops);
+		map.fitBounds(all_stops.getBounds());
+
+		function gotostop (stop_id) {
+			console.log(stop_id)
+		};
+
 		function gohome () {
 			window.location.pathname = "/";
 		};
-
-
 	</script>
 </html>
 
