@@ -115,7 +115,7 @@
 			<div class="login-success" style="display:none">
 				<p>
 					Hello, <span id="user-email"></span>.
-					<br>Your password is <span id="user-password"></span>.
+					<br><span id="user-password"></span>.
 					<br><span id="user-token"></span>.
 				</p>
 
@@ -219,7 +219,7 @@
 					  	$(".form-entries").hide();
 					  	$("#user-email")[0].innerText = data.email;
 					  	$("#user-token")[0].innerText = "Your token is " + data.token;
-					  	$("#user-password")[0].innerText = data.password;
+					  	$("#user-password")[0].innerText = "Your password is " + data.password;
 					  	$(".login-success").show();
 					  } else {
 					  	console.log("data", data);
@@ -257,8 +257,8 @@
 					  	} else {
 						  	$(".form-entries").hide();
 						  	$("#user-email")[0].innerText = email;
-						  	$("#user-token")[0].innerText = data.token;
-						  	$("#user-password")[0].innerText = pw1;
+						  	$("#user-token")[0].innerText = "Your token is " + data.token;
+						  	$("#user-password")[0].innerText = "Your password is " + pw1;
 						  	$(".login-success").show();
 					  	}
 					  } else {
