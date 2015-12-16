@@ -50,7 +50,7 @@ function super_ops () {
 				// now attach to local sqlite3 user accounts
 				sqlite3 = require('sqlite3').verbose();
 				usersDB = new sqlite3.Database('database/users.db');
-				usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, last_req TEXT)");
+				usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT)");
 
 				startServer();
 			}
@@ -159,6 +159,7 @@ function super_ops () {
 						res.status(500).send(err);
 					} else {
 						return_obj["stop"] = row;
+						return_obj["stop"]["dir"] = direction_id;
 
 						get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
 							if (err) {
@@ -205,6 +206,7 @@ function super_ops () {
 	app.post("/developer/create", function(req, res) {
 		var em = String(req.body.email);
 		var pw = String(req.body.password);
+		var org = String(req.body.org);
 		var tk = uuid.v4();
 		var q1 = "SELECT * FROM users WHERE email = '" + em + "';";
 		usersDB.get(q1, function (err, row) {
@@ -214,7 +216,7 @@ function super_ops () {
 				if (row) {
 					res.status(200).send({is_dupe: true, token: null});
 				} else {
-					var q2 = "INSERT INTO users VALUES ('" + em + "', '" + pw + "', '" + tk + "', '" + Date.now() + "');";
+					var q2 = "INSERT INTO users VALUES ('" + em + "', '" + pw + "', '" + tk + "', '" + org + "', '" + Date.now() + "');";
 					usersDB.run(q2, function (err, row) {
 						if (err) {
 							res.status(500).send(err);

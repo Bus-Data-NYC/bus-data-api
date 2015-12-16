@@ -85,6 +85,13 @@
 						  </div>
 						  
 						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Organization</label>
+						    <div class="col-sm-9">
+						      <input type="text" class="form-control" id="sign_up_org" placeholder="Organization/Affilliation">
+						    </div>
+						  </div>
+						  
+						  <div class="form-group">
 						    <label class="col-sm-3 control-label">Password</label>
 						    <div class="col-sm-9">
 						      <input type="password" class="form-control" id="sign_up_pw1" placeholder="Password">
@@ -231,17 +238,18 @@
 		  event.preventDefault();
 
 		  var email = $("#signup #sign_up_email")[0].value;
+		  var org = $("#signup #sign_up_org")[0].value;
 		  var pw1 = $("#signup #sign_up_pw1")[0].value;
 		  var pw2 = $("#signup #sign_up_pw2")[0].value;
 
-		  if (email == "" || pw1 == "" || pw2 == "") {
+		  if (email == "" || org == "" || pw1 == "" || pw2 == "") {
 		  	alert("Email or password not entered. Please enter and retry.");
 		  } else if (pw1 !== pw2) {
 		  	alert("Password entries do not match. Try again.")
 		  } else if (!isEmail(email)) {
 		  	alert("Not a valid email address. Try again.")
 		  } else {
-		  	$.post("/developer/create/", {email: email, password: pw1})
+		  	$.post("/developer/create/", {email: email, password: pw1, org: org})
 					.done(function(data) {
 					  if (data) {
 					  	if (data.is_dupe) {
