@@ -11,15 +11,15 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
-
+    td {
+    	padding-right: 5px;
+    }
     </style>
 
   </head>
   <body>
 
   	<div class="container" style="margin-top: 20px">
-  		
-  		<a class="pull-right btn btn-default" href="/"><i class="glyphicon glyphicon-home"></i> Home</a>
 
   		<h1>
   			<b onclick="gohome()" style="cursor:pointer">
@@ -48,16 +48,22 @@
 			
   		<div id="stops">
 
-  		<% for (var d = 0; d < route.stops.length; d++) { %>
-  			<ul style="float:left">
-  				<h5><%= route.directions[d] %> Direction</h5>
-  				<% for (var i = 0; i < route.stops[d].length; i++) { %>
-  					<li style="list-style-type:none">
-  						<a href="/routes/<%= route.route_id %>/<%= d %>/<%= route.stops[d][i].stop_id %>"><%= route.stops[d][i].stop_name %></a>
-  					</li>
-  				<% } %>
-  			</ul>
-  		<% } %>
+	  		<table>
+	  			<caption>Scheduled</caption>
+	  			<% for (var i = 0; i < 24; i++) { %>
+	  				<tr>
+	  					<td><b><%= i %>: </b></td>
+	  					<% if (route.stop_times[i].length < 1) { %>
+	  						<td>&nbsp;&ndash;</td>
+	  					<% } else { %>
+	  						<td><%= route.stop_times[i] %></td>
+	  					<% } %>
+	  				</tr>
+	  			<% } %>
+	  		</table>
+
+<%= Object.keys(route.stop_times) %>
+
 
 	  	</div>
 

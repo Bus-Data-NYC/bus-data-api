@@ -118,19 +118,53 @@ function super_ops () {
 						res.status(500).send(err);
 
 					} else {
-						return_obj.stops = [rows];
+						return_obj["stops"] = [rows];
 
 						get_stops_by_route_direction(1, route_id, function (err, rows) {
 							if (err) {
 								res.status(500).send(err);
 							} else {
-								return_obj.stops.push(rows);
+								return_obj["stops"].push(rows);
 								res.status(200).render("routes", {route: return_obj});
 							}
 						});
 					}
 				});
+			}
+		});
+	});
 
+	app.get("/routes/:route_id/:direction_id/:stop_id", function(req, res) {
+		var route_id = req.params.route_id;
+		var direction_id = req.params.direction_id;
+		var stop_id = req.params.stop_id;
+		var yyyymmdd = (new Date()).toISOString().slice(0,10).replace(/-/g,"");
+
+		get_specific_route(route_id, function (err, row) {
+			if (err) {
+				res.status(500).send(err);
+			} else {
+				return_obj = row;
+
+				get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
+					if (err) {
+						res.status(500).send(err);
+					} else {
+						var table = {};
+						for (var h = 0; h < 24; h++) { table[h] = []; }
+
+						rows.forEach(function (stop_times) {
+							if (stop_times['pickup_type'] !== 1) {
+								table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'].substring(3, 5), 'D']);
+							} else {
+								table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'].substring(3, 5), 'A']);
+							}
+						});
+
+						return_obj["stop_times"] = table;
+						res.status(200).render("route_stop", {route: return_obj});
+					}
+				});
 			}
 		});
 	});

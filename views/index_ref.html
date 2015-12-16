@@ -107,37 +107,44 @@
 		var mm = ('0' + (e.date.getMonth() + 1)).slice(-2);
 		var dd = ('0' + e.date.getDate()).slice(-2);
 		var yyyy = e.date.getFullYear();
-		$.getJSON('/api/v1/stop/' + route_short_name + '/' + direction_id + '/' + stop_id + '/' + yyyy + mm + dd, function(tt) {
-		  // Update both times tables.
-		  var table = [];
-		  for (var h = 0; h < 24; h++) table[h] = [];
-		  $.each(tt['stop_times'], function(st, stop_times) {
-		    // table[parseInt(stop_times['departure_time'].substring(0, 2))].push(stop_times['departure_time'].substring(3, 5));
-		    if (stop_times['pickup_type'] !== 1) table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'].substring(3, 5), 'D']);
-                    else table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'].substring(3, 5), 'A']);
-		  });
-		  //var times_html = '';
-		  $.each(table, function(h, mins) {
-		    if (mins.length < 1) $('#st' + h).html('&nbsp;&ndash;');
-		    else {
-		      // $('#st' + h).html(mins.join(', '));
-		      var times_html = '';
-		      $.each(mins, function(i, mins2) {
-			if (mins2[1] === 'D') times_html += '<span>' + mins2[0] + '</span>, ';
-			else times_html += '<span class="arrival">' + mins2[0] + '</span>, ';
-		      });
-		      //times_html = times_html.slice(0, -2);
-		      $('#st' + h).html(times_html.slice(0, -2));
-		    }
-		  });
-		  for (var h = 0; h < 24; h++) table[h] = [];
-                  $.each(tt['actual_times'], function(st, stop_times) {
-		    if (stop_times['departure_time'] != null) table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'], stop_times['deviation'], stop_times['vehicle_id'], stop_times['source'], 'D']);
-                    else table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'], stop_times['deviation'], stop_times['vehicle_id'], stop_times['source'], 'A']);
-                  });
-                  $.each(table, function(h, mins) {
-                    if (mins.length < 1) $('#at' + h).html('&nbsp;&ndash;');
-                    else {
+
+
+$.getJSON('/api/v1/stop/' + route_short_name + '/' + direction_id + '/' + stop_id + '/' + yyyy + mm + dd, function(tt) {
+	// Update both times tables.
+	var table = [];
+	for (var h = 0; h < 24; h++) table[h] = [];
+
+	$.each(tt['stop_times'], function(st, stop_times) {
+		// table[parseInt(stop_times['departure_time'].substring(0, 2))].push(stop_times['departure_time'].substring(3, 5));
+		if (stop_times['pickup_type'] !== 1) table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'].substring(3, 5), 'D']);
+		else table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'].substring(3, 5), 'A']);
+	});
+
+	//var times_html = '';
+	$.each(table, function(h, mins) {
+		if (mins.length < 1) $('#st' + h).html('&nbsp;&ndash;');
+		else {
+			// $('#st' + h).html(mins.join(', '));
+			var times_html = '';
+			$.each(mins, function(i, mins2) {
+				if (mins2[1] === 'D') times_html += '<span>' + mins2[0] + '</span>, ';
+				else times_html += '<span class="arrival">' + mins2[0] + '</span>, ';
+			});
+			//times_html = times_html.slice(0, -2);
+			$('#st' + h).html(times_html.slice(0, -2));
+		}
+	});
+
+	for (var h = 0; h < 24; h++) table[h] = [];
+
+	$.each(tt['actual_times'], function(st, stop_times) {
+		if (stop_times['departure_time'] != null) table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'], stop_times['deviation'], stop_times['vehicle_id'], stop_times['source'], 'D']);
+		else table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'], stop_times['deviation'], stop_times['vehicle_id'], stop_times['source'], 'A']);
+	});
+
+	$.each(table, function(h, mins) {
+		if (mins.length < 1) $('#at' + h).html('&nbsp;&ndash;');
+		else {
 			var times_html2 = '';
 			$.each(mins, function(i, mins2) {	// Update
 				var class_deviation = '';
@@ -151,11 +158,13 @@
 				var class_arrival = '';
 				if (mins2[4] === 'A') class_arrival = ' arrival';
 				times_html2 += '<span id="bus_' + mins2[2] + '_' + mins2[0] + '" class="' + class_deviation + class_source + class_arrival + '">' + mins2[0].substring(3, 5) + '</span>, ';
-                        });
+			});
 			$('#at' + h).html(times_html2.slice(0, -2));
-		    }
-                  });
-		});
+		}
+	});
+});
+
+
     	      });
 	      var schedule = [];
 	      var actual = [];
