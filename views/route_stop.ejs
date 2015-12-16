@@ -7,12 +7,25 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+		<!-- datepicker -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker3.min.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.min.js"></script>
 
     <style type="text/css">
     td {
     	padding-right: 5px;
+    }
+    .arrival {
+    	text-decoration: underline;
+    }
+    .interpolated {
+    	font-style: italic;
+    	color: grey;
     }
     </style>
 
@@ -38,19 +51,37 @@
   				<sub>
   					<span class="glyphicon glyphicon-stop" style="color:#<%= route.route_color %>"></span> 
   					<%= route.agency_id %> <%= route.route_long_name %> <%= route.route_desc %> 
-  					<a href="<%= route.route_url %>" style="font-size:x-small">
-  						(MTA Page)
-  					</a>
   				</sub>
   			</small>
   		</h1>
 
+			<div id="map" style="width:100%;height:300px;background-color:#<%= route.route_color %>"></div>
+
+			<div class="row">
+				<div class="col-xs-12">
+					<h4>
+						<small class="pull-right">
+							<span class="glyphicon glyphicon-map-marker"></span>
+							<%= route.stop.stop_name %> Stop in the <%= route.curr_direction %> Direction
+						</small>
+						<div class="input-group date" data-provide="datepicker" data-date-format="yyyy/mm/dd" style="width:275px">
+						    <div class="input-group-addon">
+						        Date
+						    </div>
+						    <input type="text" class="form-control" value="<%= (new Date()).toISOString().slice(0,10).replace(/-/g,"/") %>">
+						    <div class="input-group-addon">
+						        <span class="glyphicon glyphicon-th"></span>
+						    </div>
+						</div>
+					</h4>
+				</div>
+			</div>
 			
   		<div class="row">
 				<div class="col-sm-6 col-xs-12">
 					<div class="panel panel-default">
 					  <div class="panel-heading">
-					  	Scheduled
+					  	Scheduled Times
 					  </div>
 
 			  		<table class="table">
@@ -62,13 +93,13 @@
 			  					<% } else { %>
 			  						<td>
 			  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
-			  								<% if (route.stop_times[i][t][1] == "D") { %>
-			  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
-			  								<% } else { %>
-			  									<span style="text-decoration:underline">
+			  								<% var if_arrival = ""; %>
+			  								<% if (route.stop_times[i][t][1] !== "D") { %>
+			  									<% if_arrival = "arrival" %>
+			  								<% } %>
+			  									<span class="<%= if_arrival %>">
 			  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
 			  									</span>
-			  								<% } %>
 			  							<% } %>
 			  						</td>
 			  					<% } %>
@@ -81,25 +112,25 @@
 				<div class="col-sm-6 col-xs-12">
 					<div class="panel panel-default">
 					  <div class="panel-heading">
-					  	Scheduled
+					  	Actual Times<sup>*</sup>
 					  </div>
 
 			  		<table class="table">
 			  			<% for (var i = 0; i < 24; i++) { %>
 			  				<tr>
 			  					<td><b><%= i %>: </b></td>
-			  					<% if (route.stop_times[i].length < 1) { %>
+			  					<% if (route.actual_times[i].length < 1) { %>
 			  						<td>&nbsp;&ndash;</td>
 			  					<% } else { %>
 			  						<td>
-			  							<% for (var t = 0; t < route.stop_times[i].length; t++) { %>
-			  								<% if (route.stop_times[i][t][1] == "D") { %>
-			  									<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
-			  								<% } else { %>
-			  									<span style="text-decoration:underline">
-			  										<%= route.stop_times[i][t][0] %><% if (t < (route.stop_times[i].length - 1)) { %>,<% } %>
-			  									</span>
+			  							<% for (var t = 0; t < route.actual_times[i].length; t++) { %>
+			  								<% var classes = ""; %>
+			  								<% if (route.actual_times[i][t][3] == "C") { %>
+			  									<% classes += " interpolated"; %>
+			  								<% } if (route.actual_times[i][t][4] == "A") { %>
+			  									<% classes += " arrival"; %>
 			  								<% } %>
+			  								<span class="<%= classes %>"><%= route.actual_times[i][t][0].substring(3, 5) %><% if (t < (route.actual_times[i].length - 1)) { %>,<% } %></span>
 			  							<% } %>
 			  						</td>
 			  					<% } %>
@@ -114,12 +145,28 @@
 
   </body>
 	<script>
-		// Globals
+		String.prototype.replaceAll = function(search, replace) {
+			if (replace === undefined) { return this.toString(); } 
+			else { return this.split(search).join(replace); }
+		};
+
+		$('.datepicker').datepicker({
+		  startDate: "-1d"
+		})
+
+		var map = L.map('map', {zoomControl:false, attributionControl:false}).setView([40.75, -73.85], 10);
+		map.addControl( L.control.zoom({position: 'topright'}) );
+		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+
+		var stop = "<%= JSON.stringify(route.stop) %>";
+		stop = JSON.parse(stop.replaceAll("&#34;", '"'));
+
+		var m = L.circle([stop.stop_lat, stop.stop_lon], 15, {color: "#<%= route.route_color %>", fillOpacity: 1 }).addTo(map);
+		map.fitBounds(m.getBounds()).setZoom(15);
+
 		function gohome () {
 			window.location.pathname = "/";
 		};
-
-
 	</script>
 </html>
 

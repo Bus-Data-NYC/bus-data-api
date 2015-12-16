@@ -24,7 +24,7 @@
     	.bus-lapel:not(:last-child) {
     		margin-right: 5px;
     	}
-			.bus-lapel:hover {
+			.dev-access:hover, .bus-lapel:hover {
 				box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
 		    animation: pulse 2s ease infinite;
 			}
@@ -75,15 +75,15 @@
   	<div class="container" style="margin-top: 20px">
   		
   		<div class="row">
-	  		<div class="col-sm-4 col-xs-12">
+	  		<div class="col-sm-5 col-xs-12">
 	  			<h1><b>Bus Data API</b></h1>
 	  		</div>
 
-				<div class="col-sm-8 col-xs-12">
+				<div class="col-sm-7 col-xs-12" style="margin-top:20px">
 					<div class="input-group" id="routes_search">
 						<span class="input-group-addon">
 							<span class="glyphicon glyphicon-search"></span>
-							Search for a route
+							Search routes
 						</span>
 						<input type="text" class="form-control typeahead" 
 										id="route-query" placeholder="Search for...">
@@ -101,10 +101,10 @@
   		<div id="routes">
   			<h3>
   				Browse all routes
-  				<small class="label label-success small pull-right" 
+  				<small class="label label-default small pull-right dev-access" 
   								style="color:#FFF; cursor: pointer;"
   								onclick="godevportal()">
-  					<span class="glyphicon glyphicon-th"></span>
+  					<span class="glyphicon glyphicon-transfer"></span>
   					Developer Access
   				</small>
   			</h3>

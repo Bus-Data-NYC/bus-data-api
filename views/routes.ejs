@@ -47,8 +47,7 @@
   			</small>
   		</h1>
 
-  		<div id="map" style="height:300px;background-color:#<%= route.route_color %>">
-  		</div>
+  		<div id="map" style="height:300px;background-color:#<%= route.route_color %>"></div>
 			
   		<div id="stops">
   			<h4>Explore Individual Stops</h4>
@@ -82,10 +81,10 @@
 		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
 
 		var all_stops = [];
-		stops.forEach(function (dir) {
+		stops.forEach(function (dir, dir_i) {
 			dir.forEach(function (stop) {
 				var m = L.circle([stop.stop_lat, stop.stop_lon], 15, {color: "#<%= route.route_color %>", fillOpacity: 1 });
-				m.bindPopup("<span onclick='gotostop(" + stop.stop_id.toString() + ")' style='cursor:pointer'>" + 
+				m.bindPopup("<span onclick='gotostop(" + dir_i.toString() + ", " + stop.stop_id.toString() + ")' style='cursor:pointer'>" + 
 										stop.stop_name + "</span>", {closeButton:false});
 				all_stops.push(m);
 				m.addTo(map);
@@ -94,8 +93,9 @@
 		all_stops = L.featureGroup(all_stops);
 		map.fitBounds(all_stops.getBounds());
 
-		function gotostop (stop_id) {
-			console.log(stop_id)
+		function gotostop (dir, stop_id) {
+			var redirect = "/routes/<%= route.route_id %>/" + dir + "/" + stop_id;
+			window.location.pathname = redirect;
 		};
 
 		function gohome () {

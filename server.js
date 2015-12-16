@@ -134,35 +134,63 @@ function super_ops () {
 		});
 	});
 
-	app.get("/routes/:route_id/:direction_id/:stop_id", function(req, res) {
+	app.get("/routes/:route_id/:direction_id/:stop_id/:yyyymmdd?", function(req, res) {
 		var route_id = req.params.route_id;
 		var direction_id = req.params.direction_id;
 		var stop_id = req.params.stop_id;
-		var yyyymmdd = (new Date()).toISOString().slice(0,10).replace(/-/g,"");
+
+		var yyyymmdd = req.params.yyyymmdd;
+		if (yyyymmdd == undefined) {
+			yyyymmdd = (new Date()).toISOString().slice(0,10);
+		} else {
+			yyyymmdd = yyyymmdd.slice(0, 4) + "-" + yyyymmdd.slice(4, 6) + "-" +yyyymmdd.slice(6, 8);
+		}
+
 
 		get_specific_route(route_id, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
 			} else {
 				return_obj = row;
+				return_obj["curr_direction"] = return_obj["directions"][direction_id];
 
-				get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
+				get_stop_by_route_direction(stop_id, direction_id, route_id, function (err, row) {
 					if (err) {
 						res.status(500).send(err);
 					} else {
-						var table = {};
-						for (var h = 0; h < 24; h++) { table[h] = []; }
+						return_obj["stop"] = row;
 
-						rows.forEach(function (stop_times) {
-							if (stop_times['pickup_type'] !== 1) {
-								table[parseInt(stop_times['departure_time'].substring(0, 2))].push([stop_times['departure_time'].substring(3, 5), 'D']);
+						get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
+							if (err) {
+								res.status(500).send(err);
 							} else {
-								table[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'].substring(3, 5), 'A']);
+								var table_st = {};
+								for (var h = 0; h < 24; h++) { table_st[h] = []; }
+
+								rows["stop_times"].forEach(function (stop_times) {
+									if (stop_times['pickup_type'] !== 1) {
+										table_st[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['departure_time'].substring(3, 5), 'D']);
+									} else {
+										table_st[parseInt(stop_times['arrival_time'].substring(0, 2))].push([stop_times['arrival_time'].substring(3, 5), 'A']);
+									}
+								});
+
+								var table_at = {};
+								for (var h = 0; h < 24; h++) { table_at[h] = []; }
+
+								rows["actual_times"].forEach(function (actual_times) {
+									if (actual_times['departure_time'] != null) {
+										table_at[parseInt(actual_times['departure_time'].substring(0, 2))].push([actual_times['departure_time'], actual_times['deviation'], actual_times['vehicle_id'], actual_times['source'], 'D']);
+									} else {
+										table_at[parseInt(actual_times['arrival_time'].substring(0, 2))].push([actual_times['arrival_time'], actual_times['deviation'], actual_times['vehicle_id'], actual_times['source'], 'A']);
+									}
+								});
+
+								return_obj["stop_times"] = table_st;
+								return_obj["actual_times"] = table_at;
+								res.status(200).render("route_stop", {route: return_obj});
 							}
 						});
-
-						return_obj["stop_times"] = table;
-						res.status(200).render("route_stop", {route: return_obj});
 					}
 				});
 			}
@@ -370,13 +398,19 @@ function super_ops () {
 		});
 
 
-	router.route("/routes/:route_id/stops/:direction_id/:stop_id")
+	router.route("/routes/:route_id/stops/:direction_id/:stop_id/yyyymmdd")
 
 		.get(function (req, res) {
 			var route_id = req.params.route_id;
 			var direction_id = req.params.direction_id;
 			var stop_id = req.params.stop_id;
-			var yyyymmdd = (new Date()).toISOString().slice(0,10).replace(/-/g,"");
+
+			var yyyymmdd = req.params.yyyymmdd;
+			if (yyyymmdd == undefined) {
+				yyyymmdd = (new Date()).toISOString().slice(0,10);
+			} else {
+				yyyymmdd = yyyymmdd.slice(0, 4) + "-" + yyyymmdd.slice(4, 6) + "-" +yyyymmdd.slice(6, 8);
+		}
 
 			get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
 				if (err) {
@@ -451,8 +485,16 @@ function super_ops () {
 		handle_database(q, function (err, rows) { cb(err, rows); });
 	};
 
+	function get_stop_by_route_direction (stop_id, direction_id, route_id, cb) {
+		var q =  "SELECT s.stop_id, s.stop_name, '' AS stop_desc, stop_lat, stop_lon " +
+							"FROM stops_current s, rds WHERE direction_id = " + direction_id + " AND rds.stop_id = s.stop_id " +
+							"AND route_id = '" + route_id + "' AND s.stop_id = '" + stop_id + "' LIMIT 1;";
+		handle_database(q, function (err, rows) { cb(err, rows[0]); });
+	};
+
 	function get_stop_data_by_day (yyyymmdd, stop_id, direction_id, route_id, cb) {
-		var q = "SELECT trip_id, trip_headsign, dep AS arrival_time, dep AS departure_time, stop_sequence, pickup_type, drop_off_type " +
+		var response_obj = {};
+		var q1 = "SELECT trip_id, trip_headsign, dep AS arrival_time, dep AS departure_time, stop_sequence, pickup_type, drop_off_type " +
 						"FROM (" + 
 							"SELECT IF(date_offset < 1, departure_time, SUBTIME(departure_time, '24:00:00')) " +
 								"AS dep, date_offset, trip_id, trip_headsign, stop_sequence, pickup_type, drop_off_type " +
@@ -461,7 +503,37 @@ function super_ops () {
 									"AND dt.direction_id = '" + direction_id + "' AND st.stop_id = '" + stop_id + "'" +
 									"AND dt.trip_index = st.trip_index AND st.trip_index = t.trip_index" +
 						") AS x WHERE dep BETWEEN '-00:00:30' AND '23:59:29' ORDER BY dep;";
-		handle_database(q, function (err, rows) { cb(err, rows); });
+		handle_database(q1, function (err, rows) { 
+			if (err) {
+				cb(err, null); 
+			} else {
+				response_obj["stop_times"] = rows;
+
+				var q2 = "SELECT TIME(IF(dwell_time = -2, NULL, IF(dwell_time = -1, call_time, DATE_SUB(call_time, INTERVAL dwell_time SECOND)))) est_arr, " + 
+										"IF(dwell_time = -1, NULL, TIME(call_time)) est_dep, " + 
+								        "deviation, " +
+								        "vehicle_id, " +
+								        "CASE source WHEN 'S' THEN 'X' WHEN 'E' THEN 'X' ELSE source END AS source " +
+											"FROM calls WHERE rds = (SELECT rds FROM rds WHERE route_id = '" + route_id + "' AND direction_id = 0 AND stop_id = 104373 LIMIT 1) " + 
+								            "AND call_time BETWEEN '" + yyyymmdd + " 00:00:00' AND '" + yyyymmdd + " 23:59:59';"
+				handle_database(q2, function (err, rows) {
+					if (err) {
+						cb(err, null);
+					} else {
+						response_obj["actual_times"] = rows.map(function (r) {
+							return {
+								"arrival_time": r.est_arr,
+								"departure_time": r.est_dep,
+								"deviation": parseInt(r.deviation),
+								"vehicle_id": r.vehicle_id,
+								"source": r.source
+							}
+						});
+						cb(err, response_obj);
+					}
+				});
+			}
+		});
 	};
 
 
