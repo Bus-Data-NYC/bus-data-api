@@ -1,3 +1,4 @@
 credentials.json
-node_modules/
-ref_code/
+node_modules
+ref_code
+bower_components

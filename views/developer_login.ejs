@@ -11,7 +11,6 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
-
     </style>
 
   </head>
@@ -26,50 +25,83 @@
   			<span style="color:grey;font-weight:100">Developer Portal</span>
   		</h1>
 
-	  	<div class="form-entries">
+	  	<div class="row form-entries">
 
-				<form class="panel panel-default" id="signin">
-					<div class="panel-heading">
-						<b>Sign In</b>
-					</div>
-					<div class="panel-body">
-					  <br>Email:
-					  <input type="text" id="sign_in_email">
-					  Password:
-					  <input type="text" id="sign_in_pw">
-					  <input class="btn btn-default" type="submit" value="Sign In">
-					</div>
-				</form>
-				
-				<br>
+		  	<div class="col-xs-12 col-sm-6">
+					<form class="panel panel-default form-horizontal" id="signin">
+						<div class="panel-heading">
+							<b>Sign In</b>
+						</div>
+						<div class="panel-body">
+						  
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Email</label>
+						    <div class="col-sm-9">
+						      <input type="email" class="form-control" id="sign_in_email" placeholder="Email">
+						    </div>
+						  </div>
 
-				<form class="panel panel-default" id="signup">
-					<div class="panel-heading">
-						<b>Sign Up</b>
-					</div>
-					<div class="panel-body">
-					  <br>Email:
-					  <input type="text" id="sign_up_email">
-					  Password:
-					  <input type="text" id="sign_up_pw1">
-					  Password (re-enter):
-					  <input type="text" id="sign_up_pw2">
-					  <input class="btn btn-default" type="submit" value="Sign Up">
-					</div>
-				</form>
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Password</label>
+						    <div class="col-sm-9">
+						      <input type="password" class="form-control" id="sign_in_pw" placeholder="Password">
+						    </div>
+						  </div>
 
-				<br>
+						  <input class="btn btn-success pull-right" type="submit" value="Sign In">
+						</div>
+					</form>
 
-				<form class="panel panel-default" id="forgot_pw">
-					<div class="panel-heading">
-						<b>Get your password if you forgot it</b>
-					</div>
-					<div class="panel-body">
-					  <br>Enter the email address associated with the account:
-					  <input type="text" id="forgot_pw_email">
-					  <input class="btn btn-default" type="submit" value="Send password to account">
-					</div>
-				</form>
+					<form class="panel panel-default form-horizontal" id="forgot_pw">
+						<div class="panel-heading">
+							<b>Get your password if you forgot it</b>
+						</div>
+						<div class="panel-body">
+						  
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Email</label>
+						    <div class="col-sm-9">
+						      <input type="email" class="form-control" id="forgot_pw_email" placeholder="Email">
+						    </div>
+						  </div>
+
+						  <input class="btn btn-warning pull-right" type="submit" value="Send password to email">
+						</div>
+					</form>
+				</div>
+
+				<div class="col-xs-12 col-sm-6">
+					<form class="panel panel-default form-horizontal" id="signup">
+						<div class="panel-heading">
+							<b>Sign Up</b>
+						</div>
+						<div class="panel-body">
+						  
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Email</label>
+						    <div class="col-sm-9">
+						      <input type="email" class="form-control" id="sign_up_email" placeholder="Email">
+						    </div>
+						  </div>
+						  
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Password</label>
+						    <div class="col-sm-9">
+						      <input type="password" class="form-control" id="sign_up_pw1" placeholder="Password">
+						    </div>
+						  </div>
+						  
+						  <div class="form-group">
+						    <label class="col-sm-3 control-label">Re-enter</label>
+						    <div class="col-sm-9">
+						      <input type="password" class="form-control" id="sign_up_pw2" placeholder="Password (re-enter)">
+						    </div>
+						  </div>
+
+						  <input class="btn btn-info pull-right" type="submit" value="Sign Up">
+						</div>
+					</form>
+				</div>
 
 			</div>
 
@@ -77,7 +109,7 @@
 				<p>
 					Hello, <span id="user-email"></span>.
 					<br>Your password is <span id="user-password"></span>.
-					<br>Your token is <span id="user-token"></span>.
+					<br><span id="user-token"></span>.
 				</p>
 
 				<!-- New token success -->
@@ -100,10 +132,6 @@
 
   </body>
 	<script>
-		// Globals
-		var routes = [];
-
-
 
 		// UTILITIES
 		function isEmail (email) {
@@ -112,19 +140,26 @@
 		};
 
 		function deleteUser () {
-	  	var em = $("#user-email")[0].innerText;
-	  	var pw = $("#user-password")[0].innerText;
-	  	var address = "/developer/account/" + em + "/" + pw;
-			$.ajax({
-			  url: address,
-			  type: "DELETE",
-			  success: function () {
-			  	window.location.pathname = "/";
-			  },
-			  error: function () {
-			  	alert("Something happened, account was not deleted.");
-			  }
-			});
+			if (confirm("Are you sure you want to delete this account?")) {
+		  	var em = $("#user-email")[0].innerText;
+		  	var pw = $("#user-password")[0].innerText;
+		  	var address = "/developer/account/" + em + "/" + pw;
+
+		  	$("#new_token_success").fadeOut();
+		  	$("#new_token_success")[0].innerHTML = "<i>Please wait... Delete operation can take a few seconds.</i><br><br>"
+		  	$("#new_token_success").fadeIn();
+
+				$.ajax({
+				  url: address,
+				  type: "DELETE",
+				  success: function () {
+				  	window.location.pathname = "/";
+				  },
+				  error: function () {
+				  	alert("Something happened, account was not deleted.");
+				  }
+				});
+			}
 		};	
 
 		function newToken () {
@@ -134,7 +169,7 @@
 	  	$.post("/developer/new_token/", {email: em, password: pw, token: tk})
 				.done(function (token) {
 				  if (token) {
-				  	$("#user-token")[0].innerHTML = "updated. New token is <b>" + token + "</b>";
+				  	$("#user-token")[0].innerHTML = "Your token is updated. New token is <b>" + token + "</b>";
 				  	$("#new_token_success").fadeOut();
 				  	$("#new_token_success").fadeIn();
 				  } else {
@@ -174,10 +209,9 @@
 		  	$.get(address)
 					.done(function(data) {
 					  if (data) {
-					  	console.log("S", data);
 					  	$(".form-entries").hide();
 					  	$("#user-email")[0].innerText = data.email;
-					  	$("#user-token")[0].innerText = data.token;
+					  	$("#user-token")[0].innerText = "Your token is " + data.token;
 					  	$("#user-password")[0].innerText = data.password;
 					  	$(".login-success").show();
 					  } else {
