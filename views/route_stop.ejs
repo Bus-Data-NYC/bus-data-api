@@ -64,12 +64,13 @@
 							<span class="glyphicon glyphicon-map-marker"></span>
 							<%= route.stop.stop_name %> Stop in the <%= route.curr_direction %> Direction
 						</small>
-						<div class="input-group date" data-provide="datepicker" data-date-format="yyyy/mm/dd" style="width:275px">
+						<div class="input-group date" data-provide="datepicker" data-date-format="yyyy/mm/dd" style="width:225px">
 						    <div class="input-group-addon">
 						        Date
 						    </div>
-						    <input type="text" class="form-control" value="<%= (new Date()).toISOString().slice(0,10).replace(/-/g,"/") %>">
-						    <div class="input-group-addon">
+						    <input type="text" id="datepicker_input" 
+						    				class="form-control" value="<%= (new Date()).toISOString().slice(0,10).replace(/-/g,"/") %>">
+						    <div class="input-group-addon" style="cursor:pointer">
 						        <span class="glyphicon glyphicon-th"></span>
 						    </div>
 						</div>
@@ -150,19 +151,31 @@
 			else { return this.split(search).join(replace); }
 		};
 
-		$('.datepicker').datepicker({
-		  startDate: "-1d"
-		})
+		window.onload = function () {
 
-		var map = L.map('map', {zoomControl:false, attributionControl:false}).setView([40.75, -73.85], 10);
-		map.addControl( L.control.zoom({position: 'topright'}) );
-		L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+	    $('#datepicker_input').change(dateChanged)
 
-		var stop = "<%= JSON.stringify(route.stop) %>";
-		stop = JSON.parse(stop.replaceAll("&#34;", '"'));
+			var spec_date = window.location.pathname.split("/")[5];
+			if (spec_date !== undefined) {
+				$('.date #datepicker_input')[0].value = spec_date.slice(0, 4) + "/" + spec_date.slice(4, 6) + "/" +spec_date.slice(6, 8);
+			}
 
-		var m = L.circle([stop.stop_lat, stop.stop_lon], 15, {color: "#<%= route.route_color %>", fillOpacity: 1 }).addTo(map);
-		map.fitBounds(m.getBounds()).setZoom(15);
+			var map = L.map('map', {zoomControl:false, attributionControl:false}).setView([40.75, -73.85], 10);
+			map.addControl( L.control.zoom({position: 'topright'}) );
+			L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png').addTo(map);
+
+			var stop = "<%= JSON.stringify(route.stop) %>";
+			stop = JSON.parse(stop.replaceAll("&#34;", '"'));
+
+			var m = L.circle([stop.stop_lat, stop.stop_lon], 15, {color: "#<%= route.route_color %>", fillOpacity: 1 }).addTo(map);
+			map.fitBounds(m.getBounds()).setZoom(15);
+		};
+
+		function dateChanged (e) {
+			var new_date = e.target.value.split("/").join("");
+		  var redirect = window.location.pathname + "/" + new_date;
+		  window.location.pathname = redirect;
+		}
 
 		function gohome () {
 			window.location.pathname = "/";
