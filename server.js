@@ -102,6 +102,15 @@ function super_ops () {
 					if (routes[boro] == undefined) routes[boro] = [];
 					routes[boro].push(route);
 				});
+				Object.keys(routes).forEach(function (route) {
+					routes[route] = routes[route].sort(function (a, b) {
+						a = Number(a.route_id.replace(/\D/g,''));
+						b = Number(b.route_id.replace(/\D/g,''));
+						if (a > b) return 1;
+						if (a < b) return -1;
+						else return 0;
+					});
+				});
 				res.render('index', {routes: routes});
 			}
 		});
@@ -132,13 +141,21 @@ function super_ops () {
 
 								var start_yr = new Date().getFullYear().toString() + "-01-01";
 								var end_yr = (new Date()).toISOString().slice(0,10);
-								get_headway_comparison(route_id, start_yr, end_yr, function (err, rows) {
+								get_headway_comparison(route_id, start_yr, end_yr, function (err, row) {
 									if (err) {
 										res.status(500).send(err);
 									} else {
-										return_obj["headways"] = rows;
+										return_obj["headways"] = row;
 
-										res.status(200).render("routes", {route: return_obj});
+										get_timeliness_distribution(route_id, function (err, row) {
+											if (err) {
+												res.status(500).send(err);
+											} else {
+												return_obj["timeliness_distribution"] = row;
+
+												res.status(200).render("routes", {route: return_obj});
+											}
+										});
 									}
 								});
 							}
@@ -565,6 +582,15 @@ function super_ops () {
 						"FROM sum_ewt_hf WHERE route_id = '" + route_id + "'";
 		if (has_start && has_end) { q = q + timeframe_clause; } 
 		else { q = q + ";"; }
+
+		handle_database(q, function (err, rows) { cb(err, rows[0]); });
+	};
+
+	function get_timeliness_distribution (route_id, cb) {
+		var q = "SELECT SUM(early)/SUM(early + on_time + late)*100 as early, " +
+								"SUM(on_time)/SUM(early + on_time + late)*100 as on_time, " +
+        				"SUM(late)/SUM(early + on_time + late)*100 as late " +
+						"FROM sum_otp_lf WHERE route_id = '" + route_id + "';";
 
 		handle_database(q, function (err, rows) { cb(err, rows[0]); });
 	};
