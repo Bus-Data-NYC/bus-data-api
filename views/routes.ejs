@@ -1,6 +1,6 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en" xml:lang="en" >
   <head>
     <meta charset="utf-8" />
     
@@ -46,7 +46,7 @@
   <body>
 
   	<div class="container" style="margin-top: 20px">
-<%= JSON.stringify(route.headways) %>
+
   		<h1>
   			<b onclick="gohome()" style="cursor:pointer">
   				Bus Data API
@@ -94,15 +94,15 @@
 
 						<table>
 							<tr>
-								<td><b>Scheduled </b></td>
+								<td><b>Scheduled</b></td>
 								<td><%= route.headways.sched_hw.toFixed(1) %> minutes</td>
 							</tr>
 							<tr>
-								<td><b>Observed </b></td>
+								<td><b>Observed</b></td>
 								<td><%= route.headways.actual_hw.toFixed(1) %> minutes</td>
 							</tr>
 							<tr>
-								<td><b>Excess </b></td>
+								<td><b>Excess</b></td>
 								<td><%= route.headways.excess_hw.toFixed(1) %> minutes</td>
 							</tr>
 						</table>
@@ -111,11 +111,34 @@
 					<div class="col-sm-6 col-xs-12">
 						<% if (route.route_id.indexOf("+") > -1) { %>
 							<p>
-								This is a Select Bus Service route and does not have on time performance data.
+								This is a Select Bus Service route and does not have on-time performance data.
 							</p>
-							<small>
+							<small style="opacity:0.75">
 								Service is advertised on a frequency basis (e.g. "every 20 minutes") and thus does not have specific scheduled arrival times.
 							</small>
+						<% } else { %>
+							<p>
+								Of all scheduled arrivals, 
+								<b>
+									<%= route.timeliness_distribution.on_time.toFixed(1) %>%
+								</b>
+								are on-time.
+							</p>
+
+							<table>
+								<tr>
+									<td><b>Early</b></td>
+									<td><%= route.timeliness_distribution.early.toFixed(1) %>%</td>
+								</tr>
+								<tr>
+									<td><b>On-time</b></td>
+									<td><%= route.timeliness_distribution.on_time.toFixed(1) %>%</td>
+								</tr>
+								<tr>
+									<td><b>Late</b></td>
+									<td><%= route.timeliness_distribution.late.toFixed(1) %>%</td>
+								</tr>
+							</table>
 						<% } %>
 					</div>
 				</div>
@@ -123,7 +146,7 @@
 				<div class="row">
 					<div class="col-xs-12">
 						<small style="opacity:0.5"><i>
-							Headway information for high frequency service (times during which bus frequency is scheduled so that buses are less than or equal to 12 minutes apart).
+							Headway (the time between buses) information for high frequency service (times during which bus frequency is scheduled so that buses are less than or equal to 12 minutes apart). Averages are calculated year to date. Early, on-time, and late percentages do not necessarily total 100% due to missing data.
 						</i></small>
 					</div>
 				</div>
