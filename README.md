@@ -9,11 +9,20 @@ An 	`credentials.json` file needs to be created locally in the root directory in
 
 ```
 {
-  "host":     "www.example.com",
-  "database": "db_name",
-  "user": "avg_joe",
-  "password": "foobar_pw",
-  "s_token":  "abcd1234EFGH"
+  "host": "example.eastus2.cloudapp.azure.com",
+  "database": "exampledatabasename",
+  "user": "exampleusername",
+  "password": "examplepassword",
+  "nodemailer": {
+    "service": "Outlook",
+    "auth": {
+      "user": "exampleemail@email.com",
+      "pass": "haveaniceday"
+    },
+    "options": {
+      "from": "Example Foobar <foobar@example.com>"
+    }
+  }
 }
 ```
 
