@@ -16,7 +16,6 @@ function super_ops () {
 	app.use(bodyParser.urlencoded({ extended: true }));
 
 	// bcrypt setup
-	var bcrypt = require('bcryptjs');
 	var uuid = require('node-uuid');
 
 	var emailUser = require('./utils/emailError.js').emailUser;
