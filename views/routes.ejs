@@ -31,13 +31,22 @@
 		  color: inherit;
 		  text-decoration: inherit;
 		}
+		.jumbotron.infobox {
+			border-radius: 0px;
+			background-color: #<%= route.route_color %>;
+			color: #<%= route.route_text_color %>;
+			padding: 25px;
+		}
+		td {
+			padding-right: 5px;
+		}
     </style>
 
   </head>
   <body>
 
   	<div class="container" style="margin-top: 20px">
-
+<%= JSON.stringify(route.headways) %>
   		<h1>
   			<b onclick="gohome()" style="cursor:pointer">
   				Bus Data API
@@ -65,6 +74,49 @@
   		</h1>
 
   		<div id="map" style="height:300px;background-color:#<%= route.route_color %>"></div>
+
+			<div class="jumbotron infobox">
+				<h4>General Statistics for the <%= route.route_short_name %></h4>
+				<div class="row">
+					<div class="col-sm-6 col-xs-12">
+						<p>
+							Average headways are 
+							<b>
+								<%= (route.headways.excess_hw/route.headways.sched_hw*100).toFixed(2) %>%
+								<% if (route.headways.excess_hw/route.headways.sched_hw > 0) { %>
+									higher
+								<% } else { %>
+									lower
+								<% } %>
+							</b>
+							than scheduled.
+						</p>
+						
+						<table>
+							<tr>
+								<td><b>Scheduled </b></td>
+								<td><%= route.headways.sched_hw.toFixed(2) %> minutes</td>
+							</tr>
+							<tr>
+								<td><b>Observed </b></td>
+								<td><%= route.headways.actual_hw.toFixed(2) %> minutes</td>
+							</tr>
+							<tr>
+								<td><b>Excess </b></td>
+								<td><%= route.headways.excess_hw.toFixed(2) %> minutes</td>
+							</tr>
+						</table>
+
+						<small><i>
+							Headway information for high frequency service (times during which bus frequency is scheduled so that buses are less than or equal to 12 minutes apart)..
+						</i></small>
+					</div>
+
+					<div class="col-sm-6 col-xs-12">
+						Foo
+					</div>
+				</div>
+			</div>
 			
   		<div id="stops">
   			<h4>Explore Individual Stops</h4>
@@ -73,7 +125,7 @@
 	  				<h5><%= route.directions[d] %> Direction</h5>
 	  				<% for (var i = 0; i < route.stops[d].length; i++) { %>
 	  					<li style="list-style-type:none">
-	  						<a href="/routes/<%= route.route_id %>/<%= d %>/<%= route.stops[d][i].stop_id %>"><%= route.stops[d][i].stop_name %></a>
+	  						<a href="/routes/<%= route.route_id %>/stops/<%= d %>/<%= route.stops[d][i].stop_id %>"><%= route.stops[d][i].stop_name %></a>
 	  					</li>
 	  				<% } %>
 	  			</ul>
@@ -111,7 +163,7 @@
 		map.fitBounds(all_stops.getBounds());
 
 		function gotostop (dir, stop_id) {
-			var redirect = "/routes/<%= route.route_id %>/" + dir + "/" + stop_id;
+			var redirect = "/routes/<%= route.route_id %>/stops/" + dir + "/" + stop_id;
 			window.location.pathname = redirect;
 		};
 

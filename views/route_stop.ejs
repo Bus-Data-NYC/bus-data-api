@@ -172,7 +172,7 @@
 
 	    $('#datepicker_input').change(dateChanged)
 
-			var spec_date = window.location.pathname.split("/")[5];
+			var spec_date = window.location.pathname.split("/")[6];
 			if (spec_date !== undefined) {
 				$('.date #datepicker_input')[0].value = spec_date.slice(0, 4) + "/" + spec_date.slice(4, 6) + "/" +spec_date.slice(6, 8);
 			}
@@ -190,7 +190,7 @@
 
 		function dateChanged (e) {
 			var new_date = e.target.value.split("/").join("");
-		  var redirect = window.location.pathname.split("/").splice(0,5).join("/")+ "/" + new_date;
+		  var redirect = window.location.pathname.split("/").splice(0,6).join("/")+ "/" + new_date;
 		  window.location.pathname = redirect;
 		}
 

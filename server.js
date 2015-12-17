@@ -129,7 +129,18 @@ function super_ops () {
 								res.status(500).send(err);
 							} else {
 								return_obj["stops"].push(rows);
-								res.status(200).render("routes", {route: return_obj});
+
+								var start_yr = new Date().getFullYear().toString() + "-01-01";
+								var end_yr = (new Date()).toISOString().slice(0,10);
+								get_headway_comparison(route_id, start_yr, end_yr, function (err, rows) {
+									if (err) {
+										res.status(500).send(err);
+									} else {
+										return_obj["headways"] = rows;
+
+										res.status(200).render("routes", {route: return_obj});
+									}
+								});
 							}
 						});
 					}
@@ -138,7 +149,7 @@ function super_ops () {
 		});
 	});
 
-	app.get("/routes/:route_id/:direction_id/:stop_id/:yyyymmdd?", function(req, res) {
+	app.get("/routes/:route_id/stops/:direction_id/:stop_id/:yyyymmdd?", function(req, res) {
 		var route_id = req.params.route_id;
 		var direction_id = req.params.direction_id;
 		var stop_id = req.params.stop_id;
@@ -521,7 +532,7 @@ function super_ops () {
 								        "deviation, " +
 								        "vehicle_id, " +
 								        "CASE source WHEN 'S' THEN 'X' WHEN 'E' THEN 'X' ELSE source END AS source " +
-											"FROM calls WHERE rds = (SELECT rds FROM rds WHERE route_id = '" + route_id + "' AND direction_id = 0 AND stop_id = 104373 LIMIT 1) " + 
+											"FROM calls WHERE rds = (SELECT rds FROM rds WHERE route_id = '" + route_id + "' AND direction_id = " + direction_id + " AND stop_id = " + stop_id + " LIMIT 1) " + 
 								            "AND call_time BETWEEN '" + yyyymmdd + " 00:00:00' AND '" + yyyymmdd + " 23:59:59';"
 				handle_database(q2, function (err, rows) {
 					if (err) {
@@ -541,6 +552,21 @@ function super_ops () {
 				});
 			}
 		});
+	};
+
+	function get_headway_comparison (route_id, start_date, end_date, cb) {
+		var has_start = (start_date !== undefined && start_date !== "" && start_date !== null && start_date);
+		var has_end = (end_date !== undefined && end_date !== "" && end_date !== null && end_date);
+		var timeframe_clause = " AND date BETWEEN '" + start_date + "' AND '" + end_date + "';";
+
+		var q = "SELECT SUM(sh_sq)/SUM(sh)/120 as sched_hw, " + 
+							"SUM(ah_sq)/SUM(ah)/120 as actual_hw, " +
+		      		"(SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120) as excess_hw " +
+						"FROM sum_ewt_hf WHERE route_id = '" + route_id + "'";
+		if (has_start && has_end) { q = q + timeframe_clause; } 
+		else { q = q + ";"; }
+
+		handle_database(q, function (err, rows) { cb(err, rows[0]); });
 	};
 
 
