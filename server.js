@@ -5,7 +5,12 @@ function super_ops () {
 	// set the view engine to ejs
 	app.set('view engine', 'ejs');
 	app.use(express.static(__dirname + './views'));
+	app.use(express.static(__dirname + './static'));
 	app.use(express.static(__dirname + './bower_components'));
+
+	// favicon
+	var favicon = require('serve-favicon');
+	app.use(favicon(__dirname + '/static/favicon.ico'));
 
 	var port = process.env.PORT || 8080; 
 
