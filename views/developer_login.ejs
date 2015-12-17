@@ -139,6 +139,8 @@
 
   </body>
 	<script>
+		//GLOBALS
+		var g = {password: null, email: null, token: null};
 
 		// UTILITIES
 		function isEmail (email) {
@@ -148,8 +150,8 @@
 
 		function deleteUser () {
 			if (confirm("Are you sure you want to delete this account?")) {
-		  	var em = $("#user-email")[0].innerText;
-		  	var pw = $("#user-password")[0].innerText;
+		  	var em = g.email;
+		  	var pw = g.password;
 		  	var address = "/developer/account/" + em + "/" + pw;
 
 		  	$("#new_token_success").fadeOut();
@@ -170,9 +172,9 @@
 		};	
 
 		function newToken () {
-	  	var em = $("#user-email")[0].innerText;
-	  	var tk = $("#user-token")[0].innerText;
-	  	var pw = $("#user-password")[0].innerText;
+	  	var em = g.email;
+	  	var tk = g.token;
+	  	var pw = g.password;
 	  	$.post("/developer/new_token/", {email: em, password: pw, token: tk})
 				.done(function (token) {
 				  if (token) {
@@ -190,7 +192,7 @@
 
 		$("#forgot_pw").submit(function (event) {
 			event.preventDefault();
-			var email = $("#forgot_pw #forgot_pw_email")[0].value;
+			var email = g.email;
 			var address = "/developer/email_pw/" + email;
 			$.get(address)
 				.done(function (data) {
@@ -217,9 +219,15 @@
 					.done(function(data) {
 					  if (data) {
 					  	$(".form-entries").hide();
+
 					  	$("#user-email")[0].innerText = data.email;
 					  	$("#user-token")[0].innerText = "Your token is " + data.token;
 					  	$("#user-password")[0].innerText = "Your password is " + data.password;
+
+					  	g.email = data.email;
+					  	g.token = data.token;
+					  	g.password = data.password;
+					  	
 					  	$(".login-success").show();
 					  } else {
 					  	console.log("data", data);
@@ -256,9 +264,15 @@
 					  		alert("Email address already in use, try a different one.")
 					  	} else {
 						  	$(".form-entries").hide();
+
 						  	$("#user-email")[0].innerText = email;
 						  	$("#user-token")[0].innerText = "Your token is " + data.token;
 						  	$("#user-password")[0].innerText = "Your password is " + pw1;
+
+						  	g.email = email;
+						  	g.token = data.token;
+						  	g.password = pw1;
+
 						  	$(".login-success").show();
 					  	}
 					  } else {

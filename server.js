@@ -266,6 +266,7 @@ function super_ops () {
 		var em = String(req.params.email);
 		var pw = String(req.params.password);
 		var query = "DELETE from users WHERE email = '" + em + "' AND password = '" + pw + "';";
+		console.log(query);
 		usersDB.run(query, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
