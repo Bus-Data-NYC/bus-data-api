@@ -118,19 +118,17 @@
 	  				</div>
 	  				<div class="panel-body">
 			  			<% for (var i = 0; i < routes[key].length; i++) { %>
-			  				<% if (routes[key][i].route_id.indexOf("+") == -1) { %>
-				   				<span class="label bus-lapel" 
-				  							id = "<%= routes[key][i].route_id %>"
-				  							style="background-color: #<%= routes[key][i].route_color %>;
-				  										color: #<%= routes[key][i].route_text_color %>;" 
-				  							onclick="gotoroute('<%= routes[key][i].route_id %>')"
-				  							api-route-boro="<%= key %>" 
-				  							api-route-desc="<%= routes[key][i].route_desc %>" 
-				  							api-agency-id="<%= routes[key][i].agency_id %>" 
-				  							api-route-url="<%= routes[key][i].route_url %>">
-				  					<%= routes[key][i].route_short_name %>
-				  				</span>
-				  			<% } %>
+			   				<span class="label bus-lapel" 
+			  							id = "<%= routes[key][i].route_id %>"
+			  							style="background-color: #<%= routes[key][i].route_color %>;
+			  										color: #<%= routes[key][i].route_text_color %>;" 
+			  							onclick="gotoroute('<%= routes[key][i].route_id %>')"
+			  							api-route-boro="<%= key %>" 
+			  							api-route-desc="<%= routes[key][i].route_desc %>" 
+			  							api-agency-id="<%= routes[key][i].agency_id %>" 
+			  							api-route-url="<%= routes[key][i].route_url %>">
+			  					<%= routes[key][i].route_short_name %>
+			  				</span>
 			  			<% } %>
 		  			</div>
 		  			<div class="panel-footer" style="font-weight: 200;"
@@ -148,6 +146,12 @@
 	  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project.
 	  	</p>
   	</center>
+
+  	<footer class="container">
+  		<small class="pull-right" style="color:gray;font-weight:200">
+  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
+  		</small>
+  	</footer>
 
   </body>
 	<script>

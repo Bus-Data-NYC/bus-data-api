@@ -82,7 +82,7 @@
 						<p>
 							Average headways are 
 							<b>
-								<%= (route.headways.excess_hw/route.headways.sched_hw*100).toFixed(2) %>%
+								<%= (route.headways.excess_hw/route.headways.sched_hw*100).toFixed(1) %>%
 								<% if (route.headways.excess_hw/route.headways.sched_hw > 0) { %>
 									higher
 								<% } else { %>
@@ -91,29 +91,40 @@
 							</b>
 							than scheduled.
 						</p>
-						
+
 						<table>
 							<tr>
 								<td><b>Scheduled </b></td>
-								<td><%= route.headways.sched_hw.toFixed(2) %> minutes</td>
+								<td><%= route.headways.sched_hw.toFixed(1) %> minutes</td>
 							</tr>
 							<tr>
 								<td><b>Observed </b></td>
-								<td><%= route.headways.actual_hw.toFixed(2) %> minutes</td>
+								<td><%= route.headways.actual_hw.toFixed(1) %> minutes</td>
 							</tr>
 							<tr>
 								<td><b>Excess </b></td>
-								<td><%= route.headways.excess_hw.toFixed(2) %> minutes</td>
+								<td><%= route.headways.excess_hw.toFixed(1) %> minutes</td>
 							</tr>
 						</table>
-
-						<small><i>
-							Headway information for high frequency service (times during which bus frequency is scheduled so that buses are less than or equal to 12 minutes apart)..
-						</i></small>
 					</div>
 
 					<div class="col-sm-6 col-xs-12">
-						Foo
+						<% if (route.route_id.indexOf("+") > -1) { %>
+							<p>
+								This is a Select Bus Service route and does not have on time performance data.
+							</p>
+							<small>
+								Service is advertised on a frequency basis (e.g. "every 20 minutes") and thus does not have specific scheduled arrival times.
+							</small>
+						<% } %>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-xs-12">
+						<small style="opacity:0.5"><i>
+							Headway information for high frequency service (times during which bus frequency is scheduled so that buses are less than or equal to 12 minutes apart).
+						</i></small>
 					</div>
 				</div>
 			</div>
@@ -133,6 +144,12 @@
 	  	</div>
 
   	</div>
+
+  	<footer class="container">
+  		<small class="pull-right" style="color:gray;font-weight:200">
+  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
+  		</small>
+  	</footer>
 
   </body>
 	<script>

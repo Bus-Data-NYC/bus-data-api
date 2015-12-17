@@ -473,7 +473,7 @@ function super_ops () {
 
 	function get_specific_route (route_id, cb) {
 		var q1 =  "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
-							"FROM routes_current WHERE route_short_name = '" + route_id + "' LIMIT 1;";
+							"FROM routes_current WHERE route_id = '" + route_id + "' LIMIT 1;";
 		handle_database(q1, function (err, rows) {
 			if (err) {
 				cb(err, null);
