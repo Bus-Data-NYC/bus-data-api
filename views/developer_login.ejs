@@ -135,17 +135,34 @@
 				<button class="btn btn-xs btn-danger" onclick="deleteUser()">
 					Delete this account
 				</button>
-
 			</div>
-
+  	</div>
+		
+		<div class="container">
+			<h3>API Documentation</h3>
+			<p>
+				Documentation of currently supported API endpoints. All API endpoints begin with <code>/api/</code>. A token is necessary to utilize the API and can be acquired at the <code>/developer</code> portion of the site. The token is passed as with key name <code>token</code> in the header of each request. Because this is a read-only API, all requests are <code>GET</code> requests (unless otherwise noted).
+			</p>
   	</div>
 
-  	<footer class="container">
-  		<small class="pull-right" style="color:gray;font-weight:200">
-  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
-  		</small>
+  	<footer class="container alert" style="color:gray;font-weight:200">
+  		<span class="pull-right">
+  			Created by 
+  			<a href="https://twitter.com/britishnathan" style="color:red">Nathan Johnson</a> 
+  			and 
+  			<a href="http://kuanbutts.com/" style="color:red">Kuan Butts</a>.
+  			<a href="" style="font-weight:bold">More about this project.</a>
+  			<br>
+		  	<small>
+		  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project
+		  		and <a href="http://betanyc.us/">BetaNYC</a> for supporting civic tech.
+	  			<br>
+	  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
+	  		</small>
+  		</span>
+	  	<br>
   	</footer>
-  	
+
   </body>
 	<script>
 		//GLOBALS

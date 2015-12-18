@@ -87,7 +87,7 @@ function super_ops () {
 	app.get('/', function(req, res) {
 		get_routes_all(function (err, rows) {
 			if (err) {
-				res.status(404).send(err);
+				res.status(500).send(err);
 			} else {
 				var routes = {};
 				rows.forEach(function (route) {
@@ -102,6 +102,7 @@ function super_ops () {
 					if (routes[boro] == undefined) routes[boro] = [];
 					routes[boro].push(route);
 				});
+
 				Object.keys(routes).forEach(function (route) {
 					routes[route] = routes[route].sort(function (a, b) {
 						a = Number(a.route_id.replace(/\D/g,''));
@@ -111,7 +112,22 @@ function super_ops () {
 						else return 0;
 					});
 				});
-				res.render('index', {routes: routes});
+
+				get_excess_waits_all(function (err, rows) {
+					if (err) {
+						console.log("ww");
+						res.status(500).send(err);
+					} else {
+						rows.sort(function (a, b) {
+							a = Number(a.excess);
+							b = Number(b.excess);
+							if (a > b) return 1;
+							if (a < b) return -1;
+							else return 0;
+						});
+						res.render('index', {routes: routes, excess: rows});
+					}
+				});
 			}
 		});
 	});
@@ -593,6 +609,13 @@ function super_ops () {
 						"FROM sum_otp_lf WHERE route_id = '" + route_id + "';";
 
 		handle_database(q, function (err, rows) { cb(err, rows[0]); });
+	};
+
+	function get_excess_waits_all (cb) {
+		var q = "SELECT route_id, TRUNCATE((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120), 1) as excess, " + 
+							"TRUNCATE(100*((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120))/(SUM(sh_sq)/SUM(sh)/120), 1) as excess_pct " + 
+						"FROM sum_ewt_hf GROUP BY route_id;";
+		handle_database(q, function (err, rows) { cb(err, rows); });
 	};
 
 
