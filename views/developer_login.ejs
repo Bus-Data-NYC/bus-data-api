@@ -146,7 +146,7 @@
 		<div class="container api-docs">
 			<h3>API Documentation</h3>
 			<p>
-				Documentation of currently supported API endpoints. All API endpoints begin with <code>/api/</code>. A token is necessary to utilize the API and can be acquired at the <code>/developer</code> portion of the site. The token is passed as with key name <code>token</code> in the header of each request. Because this is a read-only API, all requests are <code>GET</code> requests (unless otherwise noted).
+				Documentation of currently supported API endpoints. All API endpoints begin with <code>/api/</code>. A token is necessary to utilize the API and can be acquired at the <code>/developer</code> portion of the site. The token is passed as with key name <code>token</code> in the header of each request. Because this is a read-only API, all requests are <code>GET</code> requests (unless otherwise noted). For researchers looking to do more than the API supports, we provision read-only access user accounts to the MySQL database on a case-by-case basis. Please scroll to the very bottom of this page for more information.
 			</p>
 
 			<div class="row">
@@ -284,8 +284,15 @@
 }</pre>
 				</div>
 			</div>
-
 		</div>
+
+		<div class="container api-docs">
+			<h3>Full Read Access to the DB</h3>
+			<p>
+				For researchers looking to do more and perform their only queries on the data, we can provision user accounts on a case by case instance and you can either <code>ssh</code> to the MySQL portal or use a tool such as MySQL Workbench to run your own queries. To request a read-only user account, please reach out directly to use by <a href="http://kuanbutts.com/contact/">contacting us</a>.
+			</p>
+		</div>
+
 
 		<footer class="container alert" style="color:gray;font-weight:200">
 			<span class="pull-right">

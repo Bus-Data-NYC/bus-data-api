@@ -90,6 +90,7 @@ function super_ops () {
 				res.status(500).send(err);
 			} else {
 				var routes = {};
+				var route_id_list = [];
 				rows.forEach(function (route) {
 					var boro = route.route_id.replace(/[0-9]/g, '');
 
@@ -101,6 +102,7 @@ function super_ops () {
 					
 					if (routes[boro] == undefined) routes[boro] = [];
 					routes[boro].push(route);
+					route_id_list.push(route.route_id);
 				});
 
 				Object.keys(routes).forEach(function (route) {
@@ -115,7 +117,6 @@ function super_ops () {
 
 				get_excess_waits_all(function (err, rows) {
 					if (err) {
-						console.log("ww");
 						res.status(500).send(err);
 					} else {
 						rows.sort(function (a, b) {
@@ -124,6 +125,9 @@ function super_ops () {
 							if (a > b) return 1;
 							if (a < b) return -1;
 							else return 0;
+						});
+						rows = rows.filter(function (r) {
+							return (route_id_list.indexOf(r.route_id) > -1);
 						});
 						res.render('index', {routes: routes, excess: rows});
 					}
@@ -610,7 +614,8 @@ function super_ops () {
 
 	function get_excess_waits_all (cb) {
 		var q = "SELECT route_id, TRUNCATE((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120), 1) as excess, " + 
-							"TRUNCATE(100*((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120))/(SUM(sh_sq)/SUM(sh)/120), 1) as excess_pct " + 
+							"TRUNCATE(100*((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120))/(SUM(sh_sq)/SUM(sh)/120), 1) as excess_pct, " + 
+							"SUM(sched_pickups) as sched_pickups " + 
 						"FROM sum_ewt_hf GROUP BY route_id;";
 		handle_database(q, function (err, rows) { cb(err, rows); });
 	};

@@ -76,11 +76,14 @@
 			.infobox {
 				color: #FFF;
 			}
+			.infobox table {
+				/*width: 100%;*/
+			}
 			.infobox .panel-body {
 				height: 300px;
 			}
 			.infobox td {
-				font-size: 4em;
+				font-size: 3.5em;
 				font-weight: 200;
 			}
     </style>
@@ -91,8 +94,8 @@
   	<div class="container" style="margin-top: 20px">
   		
   		<div class="row">
-	  		<div class="col-sm-6 col-xs-12" style="cursor:pointer" onclick="gotosplash()">
-	  			<h1><b>Bus Data API</b></h1>
+	  		<div class="col-sm-6 col-xs-12">
+	  			<h1><b style="cursor:pointer" onclick="gotosplash()">Bus Data API</b></h1>
 	  		</div>
 
 				<div class="col-sm-6 col-xs-12" style="margin-top:20px">
@@ -137,19 +140,21 @@
 									<th>Excess Headway</th>
 									<th>% Higher</th>
 								</tr>
-							<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
-								<tr>
-									<td>
-										<b><%= excess[i].route_id %></b>
-									</td>
-									<td>
-										<%= excess[i].excess %>m
-									</td>
-									<td>
-										<%= excess[i].excess_pct %>%
-									</td>
-								</tr>
-							<% } %>
+								<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
+								<% if (Number(excess[i].sched_pickups) > 55000) { %>
+									<tr>
+										<td>
+											<b><%= excess[i].route_id %></b>
+										</td>
+										<td>
+											<%= excess[i].excess %> min
+										</td>
+										<td>
+											<%= excess[i].excess_pct %>%
+										</td>
+									</tr>
+								<% } %>
+								<% } %>
 							</table>
 						</div>
 					</div>
@@ -168,19 +173,20 @@
 									<th>Excess Headway</th>
 									<th>% Higher</th>
 								</tr>
-							<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
-								<tr>
-									<td>
-										<b><%= excess[i].route_id %></b>
-									</td>
-									<td>
-										<%= excess[i].excess %>m
-									</td>
-									<td>
-										<%= excess[i].excess_pct %>%
-									</td>
-								</tr>
-							<% } %>
+								<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
+								<% if (Number(excess[i].sched_pickups) > 55000) { %>
+									<tr>
+										<td>
+											<b><%= excess[i].route_id %></b>
+										</td>
+										<td>
+											<%= excess[i].excess %> min
+										</td>
+										<td>
+											<%= excess[i].excess_pct %>%
+										</td>
+									</tr>
+								<% } %><% } %>
 							</table>
 						</div>
 					</div>
