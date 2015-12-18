@@ -82,8 +82,8 @@
 						<p>
 							Average wait times are 
 							<b>
-								<%= (route.headways.excess_hw/route.headways.sched_hw*100).toFixed(1) %>%
-								<% if (route.headways.excess_hw/route.headways.sched_hw > 0) { %>
+								<%= route.headways.excess_pct %>%
+								<% if (route.headways.excess_pct > 0) { %>
 									higher
 								<% } else { %>
 									lower
@@ -95,15 +95,15 @@
 						<table>
 							<tr>
 								<td><b>Scheduled</b></td>
-								<td><%= route.headways.sched_hw.toFixed(1) %> minutes</td>
+								<td><%= route.headways.sched_hw %> minutes</td>
 							</tr>
 							<tr>
 								<td><b>Observed</b></td>
-								<td><%= route.headways.actual_hw.toFixed(1) %> minutes</td>
+								<td><%= route.headways.actual_hw %> minutes</td>
 							</tr>
 							<tr>
 								<td><b>Excess</b></td>
-								<td><%= route.headways.excess_hw.toFixed(1) %> minutes</td>
+								<td><%= route.headways.excess_hw %> minutes</td>
 							</tr>
 						</table>
 					</div>
@@ -120,7 +120,7 @@
 							<p>
 								Of all scheduled arrivals, 
 								<b>
-									<%= route.timeliness_distribution.on_time.toFixed(1) %>%
+									<%= route.timeliness_distribution.on_time %>%
 								</b>
 								are on-time.
 							</p>
@@ -128,15 +128,15 @@
 							<table>
 								<tr>
 									<td><b>Early</b></td>
-									<td><%= route.timeliness_distribution.early.toFixed(1) %>%</td>
+									<td><%= route.timeliness_distribution.early %>%</td>
 								</tr>
 								<tr>
 									<td><b>On-time</b></td>
-									<td><%= route.timeliness_distribution.on_time.toFixed(1) %>%</td>
+									<td><%= route.timeliness_distribution.on_time %>%</td>
 								</tr>
 								<tr>
 									<td><b>Late</b></td>
-									<td><%= route.timeliness_distribution.late.toFixed(1) %>%</td>
+									<td><%= route.timeliness_distribution.late %>%</td>
 								</tr>
 							</table>
 						<% } %>

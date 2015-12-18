@@ -595,9 +595,10 @@ function super_ops () {
 		var has_end = (end_date !== undefined && end_date !== "" && end_date !== null && end_date);
 		var timeframe_clause = " AND date BETWEEN '" + start_date + "' AND '" + end_date + "';";
 
-		var q = "SELECT SUM(sh_sq)/SUM(sh)/120 as sched_hw, " + 
-							"SUM(ah_sq)/SUM(ah)/120 as actual_hw, " +
-		      		"(SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120) as excess_hw " +
+		var q = "SELECT TRUNCATE(SUM(sh_sq)/SUM(sh)/120, 1) as sched_hw, " + 
+							"TRUNCATE(SUM(ah_sq)/SUM(ah)/120, 1) as actual_hw, " +
+		      		"TRUNCATE((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120), 1) as excess_hw, " +
+		      		"TRUNCATE(100*((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120))/(SUM(sh_sq)/SUM(sh)/120), 1) as excess_pct " + 
 						"FROM sum_ewt_hf WHERE route_id = '" + route_id + "'";
 		if (has_start && has_end) { q = q + timeframe_clause; } 
 		else { q = q + ";"; }
@@ -606,9 +607,9 @@ function super_ops () {
 	};
 
 	function get_timeliness_distribution (route_id, cb) {
-		var q = "SELECT SUM(early)/SUM(early + on_time + late)*100 as early, " +
-								"SUM(on_time)/SUM(early + on_time + late)*100 as on_time, " +
-        				"SUM(late)/SUM(early + on_time + late)*100 as late " +
+		var q = "SELECT TRUNCATE(SUM(early)/SUM(early + on_time + late)*100, 1) as early, " +
+								"TRUNCATE(SUM(on_time)/SUM(early + on_time + late)*100, 1) as on_time, " +
+        				"TRUNCATE(SUM(late)/SUM(early + on_time + late)*100, 1) as late " +
 						"FROM sum_otp_lf WHERE route_id = '" + route_id + "';";
 
 		handle_database(q, function (err, rows) { cb(err, rows[0]); });
