@@ -70,19 +70,17 @@
 			.tt-suggestion p {
 			  margin: 0;
 			}
-			.jumbotron.infobox {
-				border-radius: 0px;
-				padding: 0px;
-				color: #FFF;
-			}
 			td, th {
 				padding-right: 10px;
 			}
-			.infobox th {
-				font-size: 1.25em;
+			.infobox {
+				color: #FFF;
 			}
-			.infobox tr {
-				font-size: 1.25em;
+			.infobox .panel-body {
+				height: 300px;
+			}
+			.infobox td {
+				font-size: 4em;
 				font-weight: 200;
 			}
     </style>
@@ -115,44 +113,76 @@
 				</div>
 			</div>
 
-	<!-- 		<div class="panel panel-default" style="color:#FFF">
-				<div class="panel-heading">
-					<b>Year to date performance</b>
-				</div> -->
-			<div class="row">
-				<div class="jumbotron infobox">
-					<div class="col-xs-6" style="background-color:#00b200">
-						<table>
-							<tr>
-								<th>Route ID</th>
-								<th>Minutes</th>
-								<th>% Longer <small style="font-size:0.5em">than scheduled</small></th>
-							</tr>
-						<% for (var i = 0; i < 10; i++) { %>
-							<tr>
-								<td>
-									<b><%= excess[i].route_id %></b>
-								</td>
-								<td>
-									<%= excess[i].excess %> Minutes
-								</td>
-								<td>
-									<%= excess[i].excess_pct %>% of scheduled
-								</td>
-							</tr>
-						<% } %>
-						</table>
+
+			<h3>Year to date performance</h3>
+			<div class="row infobox">
+				<div class="col-sm-6 col-xs-12">
+					<div class="panel panel-success">
+						<div class="panel-heading">
+							<b>Top performers</b>
+						</div>
+						
+						<div class="panel-body" style="color:#00b200;overflow:auto">
+							<table>
+								<tr>
+									<th>Route ID</th>
+									<th>Excess Headway</th>
+									<th>% Higher</th>
+								</tr>
+							<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
+								<tr>
+									<td>
+										<b><%= excess[i].route_id %></b>
+									</td>
+									<td>
+										<%= excess[i].excess %>m
+									</td>
+									<td>
+										<%= excess[i].excess_pct %>%
+									</td>
+								</tr>
+							<% } %>
+							</table>
+						</div>
 					</div>
-					<div class="col-xs-6" style="background-color:#FF0000">
-						<% for (var i = (excess.length - 1); i > (excess.length - 11); i--) { %>
-							<%= excess[i].route_id %>
-						<% } %>
+				</div>
+
+				<div class="col-sm-6 col-xs-12">
+					<div class="panel panel-danger">
+						<div class="panel-heading">
+							<b>Poorest performers</b>
+						</div>
+						
+						<div class="panel-body" style="color:#e50000;overflow:auto">
+							<table>
+								<tr>
+									<th>Route ID</th>
+									<th>Excess Headway</th>
+									<th>% Higher</th>
+								</tr>
+							<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
+								<tr>
+									<td>
+										<b><%= excess[i].route_id %></b>
+									</td>
+									<td>
+										<%= excess[i].excess %>m
+									</td>
+									<td>
+										<%= excess[i].excess_pct %>%
+									</td>
+								</tr>
+							<% } %>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
+			
 
 
-				<%= JSON.stringify(excess) %>
+
+				<!-- <%= JSON.stringify(excess) %> -->
 			
   		<div id="routes">
   			<h3>
