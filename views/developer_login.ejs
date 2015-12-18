@@ -219,7 +219,7 @@
 			<div class="row">
 				<div class="col-xs-12 col-sm-4">
 					<h4 class="pull-right"><code>routes/:route_id/stops</code>
-																<br><code>/:direction_id/:stop_id</code>
+																<br><code>/:direction_id</code>
 					</h4>
 				</div>
 				<div class="col-xs-12 col-sm-8">
@@ -239,6 +239,29 @@
 				</div>
 			</div>
 
+
+			<div class="row">
+				<div class="col-xs-12 col-sm-4">
+					<h4 class="pull-right"><code>routes/:route_id/stops</code>
+																<br><code>/:direction_id/:stop_id</code>
+					</h4>
+				</div>
+				<div class="col-xs-12 col-sm-8">
+					<p>
+						Returns an object with two keys. One <code>stop_times</code>, includes an array of objects with information each instance of an arrival/departure at every stop. The second, object with two keys. The second, <code>actual_times</code>, includes an array of objects indicating recorded arrrivals and departures at each stop. The date, not being specified, defaults to the present day. As a result, the <code>actual_times</code> array may be empty if those values have not be calculated yet.
+					</p>
+<pre>{
+  "trip_id": "UP_D5-Weekday-SDon-146000_B1_44",
+  "trip_headsign": "BAY RIDGE 4 AV via 86 ST",
+  "arrival_time": "00:20:00",
+  "departure_time": "00:20:00",
+  "stop_sequence": 1,
+  "pickup_type": 0,
+  "drop_off_type": 1
+}</pre>
+				</div>
+			</div>
+
 			<div class="row">
 				<div class="col-xs-12 col-sm-4">
 					<h4 class="pull-right"><code>routes/:route_id/stops</code>
@@ -248,101 +271,16 @@
 				</div>
 				<div class="col-xs-12 col-sm-8">
 					<p>
-						Same as above route, but this time only returns the list of stops specified for variable <code>direction_id</code>. If a direction other than 0 or 1 is supplied, an empty array will be retu
+						Same as above route, except that this time you can specify a different date. Date format is <code>yyyymmdd</code>. Please note that time is in <code>UTC</code> format.
 					</p>
 <pre>{
-	"route_id": "BX1",
-	"agency_id": "MTA NYCT",
-	"route_short_name": "Bx1",
-	"route_long_name": "Riverdale - Mott Haven",
-	"route_desc": "via Grand Concourse / E 138th St",
-	"route_url": "http://web.mta.info/nyct/...",
-	"route_color": "00AEEF",
-	"route_text_color": "FFFFFF"
-}</pre>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-12 col-sm-4">
-					<h4 class="pull-right"><code>routes/:route_id/stops</code><br><code>/:direction_id</code></h4>
-				</div>
-				<div class="col-xs-12 col-sm-8">
-					<p>
-						Same as above route, but this time only returns the list of stops specified for variable <code>direction_id</code>. If a direction other than 0 or 1 is supplied, an empty array will be retu
-					</p>
-<pre>{
-	"route_id": "BX1",
-	"agency_id": "MTA NYCT",
-	"route_short_name": "Bx1",
-	"route_long_name": "Riverdale - Mott Haven",
-	"route_desc": "via Grand Concourse / E 138th St",
-	"route_url": "http://web.mta.info/nyct/...",
-	"route_color": "00AEEF",
-	"route_text_color": "FFFFFF"
-}</pre>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-12 col-sm-4">
-					<h4 class="pull-right"><code>routes/:route_id/stops</code><br><code>/:direction_id</code></h4>
-				</div>
-				<div class="col-xs-12 col-sm-8">
-					<p>
-						Same as above route, but this time only returns the list of stops specified for variable <code>direction_id</code>. If a direction other than 0 or 1 is supplied, an empty array will be retu
-					</p>
-<pre>{
-	"route_id": "BX1",
-	"agency_id": "MTA NYCT",
-	"route_short_name": "Bx1",
-	"route_long_name": "Riverdale - Mott Haven",
-	"route_desc": "via Grand Concourse / E 138th St",
-	"route_url": "http://web.mta.info/nyct/...",
-	"route_color": "00AEEF",
-	"route_text_color": "FFFFFF"
-}</pre>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-12 col-sm-4">
-					<h4 class="pull-right"><code>routes/:route_id/stops</code><br><code>/:direction_id</code></h4>
-				</div>
-				<div class="col-xs-12 col-sm-8">
-					<p>
-						Same as above route, but this time only returns the list of stops specified for variable <code>direction_id</code>. If a direction other than 0 or 1 is supplied, an empty array will be retu
-					</p>
-<pre>{
-	"route_id": "BX1",
-	"agency_id": "MTA NYCT",
-	"route_short_name": "Bx1",
-	"route_long_name": "Riverdale - Mott Haven",
-	"route_desc": "via Grand Concourse / E 138th St",
-	"route_url": "http://web.mta.info/nyct/...",
-	"route_color": "00AEEF",
-	"route_text_color": "FFFFFF"
-}</pre>
-				</div>
-			</div>
-
-			<div class="row">
-				<div class="col-xs-12 col-sm-4">
-					<h4 class="pull-right"><code>routes/:route_id/stops</code><br><code>/:direction_id</code></h4>
-				</div>
-				<div class="col-xs-12 col-sm-8">
-					<p>
-						Same as above route, but this time only returns the list of stops specified for variable <code>direction_id</code>. If a direction other than 0 or 1 is supplied, an empty array will be retu
-					</p>
-<pre>{
-	"route_id": "BX1",
-	"agency_id": "MTA NYCT",
-	"route_short_name": "Bx1",
-	"route_long_name": "Riverdale - Mott Haven",
-	"route_desc": "via Grand Concourse / E 138th St",
-	"route_url": "http://web.mta.info/nyct/...",
-	"route_color": "00AEEF",
-	"route_text_color": "FFFFFF"
+  "trip_id": "UP_D5-Weekday-SDon-146000_B1_44",
+  "trip_headsign": "BAY RIDGE 4 AV via 86 ST",
+  "arrival_time": "00:20:00",
+  "departure_time": "00:20:00",
+  "stop_sequence": 1,
+  "pickup_type": 0,
+  "drop_off_type": 1
 }</pre>
 				</div>
 			</div>

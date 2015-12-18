@@ -452,19 +452,13 @@ function super_ops () {
 		});
 
 
-	router.route("/routes/:route_id/stops/:direction_id/:stop_id/:yyyymmdd")
+	router.route("/routes/:route_id/stops/:direction_id/:stop_id")
 
 		.get(function (req, res) {
 			var route_id = req.params.route_id;
 			var direction_id = req.params.direction_id;
 			var stop_id = req.params.stop_id;
-
-			var yyyymmdd = req.params.yyyymmdd;
-			if (yyyymmdd == undefined) {
-				yyyymmdd = (new Date()).toISOString().slice(0,10);
-			} else {
-				yyyymmdd = yyyymmdd.slice(0, 4) + "-" + yyyymmdd.slice(4, 6) + "-" +yyyymmdd.slice(6, 8);
-		}
+			var yyyymmdd = (new Date()).toISOString().slice(0,10);
 
 			get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
 				if (err) {
@@ -482,7 +476,7 @@ function super_ops () {
 			var route_id = req.params.route_id;
 			var direction_id = req.params.direction_id;
 			var stop_id = req.params.stop_id;
-			var yyyymmdd = req.params.date;
+			var yyyymmdd = yyyymmdd.slice(0, 4) + "-" + yyyymmdd.slice(4, 6) + "-" +yyyymmdd.slice(6, 8);
 
 			get_stop_data_by_day(yyyymmdd, stop_id, direction_id, route_id, function (err, rows) {
 				if (err) {
