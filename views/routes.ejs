@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     
-    <title>Bus Transit Data</title>
+    <title>NYC Bus Transit Data</title>
 
     <link rel="icon" href="/favicon.ico" type="image/icon">
 
@@ -80,7 +80,7 @@
 				<div class="row">
 					<div class="col-sm-6 col-xs-12">
 						<p>
-							Average observed wait times are 
+							Average wait times are 
 							<b>
 								<%= (route.headways.excess_hw/route.headways.sched_hw*100).toFixed(1) %>%
 								<% if (route.headways.excess_hw/route.headways.sched_hw > 0) { %>
@@ -174,7 +174,7 @@
   			<a href="https://twitter.com/britishnathan" style="color:red">Nathan Johnson</a> 
   			and 
   			<a href="http://kuanbutts.com/" style="color:red">Kuan Butts</a>.
-  			<a href="" style="font-weight:bold">More about this project.</a>
+  			<a href="/about" style="font-weight:bold">More about this project.</a>
   			<br>
 		  	<small>
 		  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project
