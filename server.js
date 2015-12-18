@@ -132,6 +132,10 @@ function super_ops () {
 		});
 	});
 
+	app.get("/about", function (req, res) {
+		res.status(200).render("about");
+	});
+
 	app.get("/routes/:route_id", function (req, res) {
 		var route_id = req.params.route_id;
 		var return_obj;
@@ -395,13 +399,12 @@ function super_ops () {
 
 		.get(function (req, res) {
 			var route_id = req.params.route_id;
-			var return_obj;
 
 			get_specific_route(route_id, function (err, rows) {
 				if (err) {
 					res.status(500).send(err);
 				} else {
-					res.status(200).send(return_obj);
+					res.status(200).send(rows);
 				}
 			});
 		});
@@ -449,7 +452,7 @@ function super_ops () {
 		});
 
 
-	router.route("/routes/:route_id/stops/:direction_id/:stop_id/yyyymmdd")
+	router.route("/routes/:route_id/stops/:direction_id/:stop_id/:yyyymmdd")
 
 		.get(function (req, res) {
 			var route_id = req.params.route_id;
