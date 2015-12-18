@@ -115,7 +115,9 @@ function super_ops () {
 					});
 				});
 
-				get_excess_waits_all(function (err, rows) {
+				var start_yr = new Date().getFullYear().toString() + "-01-01";
+				var end_yr = (new Date()).toISOString().slice(0,10);
+				get_excess_waits_all(start_yr, end_yr, function (err, rows) {
 					if (err) {
 						res.status(500).send(err);
 					} else {
@@ -612,11 +614,13 @@ function super_ops () {
 		handle_database(q, function (err, rows) { cb(err, rows[0]); });
 	};
 
-	function get_excess_waits_all (cb) {
+	function get_excess_waits_all (start_date, end_date, cb) {
 		var q = "SELECT route_id, TRUNCATE((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120), 1) as excess, " + 
 							"TRUNCATE(100*((SUM(ah_sq)/SUM(ah)/120) - (SUM(sh_sq)/SUM(sh)/120))/(SUM(sh_sq)/SUM(sh)/120), 1) as excess_pct, " + 
 							"SUM(sched_pickups) as sched_pickups " + 
-						"FROM sum_ewt_hf GROUP BY route_id;";
+						"FROM sum_ewt_hf " + 
+						"WHERE date BETWEEN '" + start_date + "' AND '" + end_date + "' " + 
+						"GROUP BY route_id;";
 		handle_database(q, function (err, rows) { cb(err, rows); });
 	};
 
