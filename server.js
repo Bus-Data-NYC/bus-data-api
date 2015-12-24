@@ -47,16 +47,40 @@ function super_ops () {
 
 		pool.getConnection(function (err, connection) {
 			try { connection.release(); } catch (e) { console.log("Error on connection release: ", e) }
-			if (err) {
+			if (err && false) {
 				console.log("Connection to MySQL server failed.");
 			} else {
 
 				// now attach to local sqlite3 user accounts
 				sqlite3 = require('sqlite3').verbose();
 				usersDB = new sqlite3.Database('database/users.db');
-				usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT)");
+				usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT);", function () {
+					var q = "PRAGMA table_info(users)";
+					usersDB.all(q, function (err, res) {
+						if (err) {
+							console.log("Server failed to start, SQLITE3 database errors occurred.");
+						} else {
+							var schemaBad = false;
+							res.map(function (ea) { return {type: ea.type, name: ea.name }; });
+							res.forEach(function (ea) { if (ea.type !== "TEXT") { schemaBad = true; } });
 
-				startServer();
+							var reference = ["email", "xp", "token", "organization", "last_req"];
+							res.forEach(function (ea, i) { if (reference[i] !== ea.name) { schemaBad = true; } });
+
+							// designed to only handle old pw col name issue
+							if (schemaBad) {
+								usersDB.serialize(function() {
+								  usersDB.run("ALTER TABLE users RENAME TO users_temp;");
+								  usersDB.run("CREATE TABLE users (email TEXT, xp TEXT, token TEXT, organization TEXT, last_req TEXT);");
+							    usersDB.run("INSERT INTO users(email, xp, token, organization, last_req) SELECT email, password, token, organization, last_req FROM users_temp;");
+							    usersDB.run("DROP TABLE users_temp;", function () { startServer(); });
+								});
+							} else {
+								startServer();
+							}
+						}
+					});
+				});
 			}
 		});
 	});
@@ -292,7 +316,7 @@ function super_ops () {
 		var pw = String(req.body.password);
 		var tk = String(req.body.token);
 		var new_tk = uuid.v4();
-		var q = "UPDATE users SET token = '" + new_tk + "' WHERE email = '" + em + "' AND password = '" + pw + "';";
+		var q = "UPDATE users SET token = '" + new_tk + "' WHERE email = '" + em + "' AND xp = '" + pw + "';";
 		usersDB.run(q, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
@@ -324,7 +348,7 @@ function super_ops () {
 	app.delete("/developer/account/:email/:password", function(req, res) {
 		var em = String(req.params.email);
 		var pw = String(req.params.password);
-		var query = "DELETE from users WHERE email = '" + em + "' AND password = '" + pw + "';";
+		var query = "DELETE from users WHERE email = '" + em + "' AND xp = '" + pw + "';";
 		console.log(query);
 		usersDB.run(query, function (err, row) {
 			if (err) {
@@ -338,7 +362,7 @@ function super_ops () {
 	app.get("/developer/account/:email/:password", function(req, res) {
 		var em = String(req.params.email);
 		var pw = String(req.params.password);
-		var query = "SELECT * FROM users WHERE email = '" + em + "' and password = '" + pw + "';";
+		var query = "SELECT * FROM users WHERE email = '" + em + "' and xp = '" + pw + "';";
 		usersDB.get(query, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
