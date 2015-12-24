@@ -367,6 +367,8 @@ function super_ops () {
 			if (err) {
 				res.status(500).send(err);
 			} else {
+				row.password = Array(row.xp.length + 1).join("*");
+				delete row.xp;
 				res.status(200).send(row)
 			}
 		});

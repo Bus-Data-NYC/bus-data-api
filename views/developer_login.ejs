@@ -122,9 +122,9 @@
 
 			<div class="login-success" style="display:none">
 				<p>
-					Hello, <span id="user-email"></span>.
-					<br><span id="user-password"></span>.
-					<br><span id="user-token"></span>.
+					Hello, <span id="user-email"></span>
+					<br><span id="user-password"></span>
+					<br><span id="user-token"></span>
 				</p>
 
 				<!-- New token success -->
@@ -353,7 +353,7 @@
 			$.post("/developer/new_token/", {email: em, password: pw, token: tk})
 				.done(function (token) {
 					if (token) {
-						$("#user-token")[0].innerHTML = "Your token is updated. New token is <b>" + token + "</b>";
+						$("#user-token")[0].innerHTML = "Your token is updated. New token is <b><code>" + token + "</code></b>";
 						$("#new_token_success").fadeOut();
 						$("#new_token_success").fadeIn();
 					} else {
@@ -395,9 +395,9 @@
 						if (data) {
 							$(".form-entries").hide();
 
-							$("#user-email")[0].innerText = data.email;
-							$("#user-token")[0].innerText = "Your token is " + data.token;
-							$("#user-password")[0].innerText = "Your password is " + data.password;
+							$("#user-email")[0].innerHTML = data.email;
+							$("#user-token")[0].innerHTML = "Your token is <code>" + data.token + "</code>";
+							$("#user-password")[0].innerHTML = "Your password is " + data.password;
 
 							g.email = data.email;
 							g.token = data.token;
@@ -441,9 +441,9 @@
 							} else {
 								$(".form-entries").hide();
 
-								$("#user-email")[0].innerText = email;
-								$("#user-token")[0].innerText = "Your token is " + data.token;
-								$("#user-password")[0].innerText = "Your password is " + Array(pw1.length + 1).join("*");
+								$("#user-email")[0].innerHTML = email;
+								$("#user-token")[0].innerHTML = "Your token is <code>" + data.token + "</code>";
+								$("#user-password")[0].innerHTML = "Your password is " + Array(pw1.length + 1).join("*");
 
 								g.email = email;
 								g.token = data.token;
