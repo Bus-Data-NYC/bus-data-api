@@ -141,19 +141,21 @@
 									<th>% Higher</th>
 								</tr>
 								<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
-								<% if (Number(excess[i].sched_pickups) > 55000) { %>
-									<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
-										<td>
-											<b><%= excess[i].route_id %></b>
-										</td>
-										<td>
-											<%= excess[i].excess %> min
-										</td>
-										<td>
-											<%= excess[i].excess_pct %>%
-										</td>
-									</tr>
-								<% } %>
+									
+									<% if (excess.length > 0 && Number(excess[i].sched_pickups) > 55000) { %>
+										<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
+											<td>
+												<b><%= excess[i].route_id %></b>
+											</td>
+											<td>
+												<%= excess[i].excess %> min
+											</td>
+											<td>
+												<%= excess[i].excess_pct %>%
+											</td>
+										</tr>
+									<% } %>
+	
 								<% } %>
 							</table>
 						</div>
