@@ -134,30 +134,41 @@
 						</div>
 						
 						<div class="panel-table" style="color:#00b200;overflow:auto">
+
 							<table class="table table-striped table-hover">
-								<tr>
-									<th>Route ID</th>
-									<th>Excess Wait Time</th>
-									<th>% Higher</th>
-								</tr>
-								<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
-									
-									<% if (excess.length > 0 && Number(excess[i].sched_pickups) > 55000) { %>
-										<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
-											<td>
-												<b><%= excess[i].route_id %></b>
-											</td>
-											<td>
-												<%= excess[i].excess %> min
-											</td>
-											<td>
-												<%= excess[i].excess_pct %>%
-											</td>
-										</tr>
+								<% if (excess.length > 0) { %>
+									<tr>
+										<th>Route ID</th>
+										<th>Excess Wait Time</th>
+										<th>% Higher</th>
+									</tr>
+									<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
+										
+										<% if (Number(excess[i].sched_pickups) > 55000) { %>
+											<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
+												<td>
+													<b><%= excess[i].route_id %></b>
+												</td>
+												<td>
+													<%= excess[i].excess %> min
+												</td>
+												<td>
+													<%= excess[i].excess_pct %>%
+												</td>
+											</tr>
+										<% } %>
+		
 									<% } %>
-	
+									
+								<% } else { %>
+									<tr style="cursor:pointer">
+										<td>
+											<b>No results yet for year to date.</b>
+										</td>
+									</tr>
 								<% } %>
 							</table>
+
 						</div>
 					</div>
 				</div>
@@ -170,26 +181,39 @@
 						
 						<div class="panel-table" style="color:#e50000;overflow:auto">
 							<table class="table table-striped table-hover">
-								<tr>
-									<th>Route ID</th>
-									<th>Excess Wait Time</th>
-									<th>% Higher</th>
-								</tr>
-								<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
-								<% if (Number(excess[i].sched_pickups) > 55000) { %>
-									<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
+
+								<% if (excess.length > 0) { %>
+									<tr>
+										<th>Route ID</th>
+										<th>Excess Wait Time</th>
+										<th>% Higher</th>
+									</tr>
+									<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
+
+										<% if (Number(excess[i].sched_pickups) > 55000) { %>
+											<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
+												<td>
+													<b><%= excess[i].route_id %></b>
+												</td>
+												<td>
+													<%= excess[i].excess %> min
+												</td>
+												<td>
+													<%= excess[i].excess_pct %>%
+												</td>
+											</tr>
+										<% } %>
+
+									<% } %>
+								<% } else { %>
+									<tr style="cursor:pointer">
 										<td>
-											<b><%= excess[i].route_id %></b>
-										</td>
-										<td>
-											<%= excess[i].excess %> min
-										</td>
-										<td>
-											<%= excess[i].excess_pct %>%
+											<b>No results yet for year to date.</b>
 										</td>
 									</tr>
-								<% } %><% } %>
+								<% } %>
 							</table>
+							
 						</div>
 					</div>
 				</div>
