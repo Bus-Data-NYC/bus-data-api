@@ -95,7 +95,15 @@
   		
   		<div class="row">
 	  		<div class="col-sm-6 col-xs-12">
-	  			<h1><b style="cursor:pointer" onclick="gotosplash()">Bus Data API</b></h1>
+	  			<h1>
+	  				<b style="cursor:pointer" onclick="gotosplash()">Bus Data API</b>
+						<small class="label label-danger dev-access" 
+										style="cursor: pointer; font-size: 0.35em; vertical-align: super;"
+										onclick="godevportal()">
+							<span class="glyphicon glyphicon-transfer"></span>
+							Developer Access
+						</small>
+					</h1>
 	  		</div>
 
 				<div class="col-sm-6 col-xs-12" style="margin-top:20px">
@@ -119,12 +127,6 @@
 
 			<h3>
 				Year to date performance
-				<small class="label label-default small pull-right dev-access" 
-								style="color:#FFF; cursor: pointer;"
-								onclick="godevportal()">
-					<span class="glyphicon glyphicon-transfer"></span>
-					Developer Access
-				</small>
 			</h3>
 			<div class="row infobox">
 				<div class="col-sm-6 col-xs-12">
@@ -213,7 +215,7 @@
 									</tr>
 								<% } %>
 							</table>
-							
+
 						</div>
 					</div>
 				</div>
