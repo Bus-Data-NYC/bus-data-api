@@ -139,7 +139,7 @@ function super_ops () {
 					});
 				});
 
-				var start_yr = new Date().getFullYear().toString() + "-01-01";
+				var start_yr = (new Date().getFullYear().toString() - 1).toString() + "-01-01";
 				var end_yr = (new Date()).toISOString().slice(0,10);
 				get_excess_waits_all(start_yr, end_yr, function (err, rows) {
 					if (err) {
