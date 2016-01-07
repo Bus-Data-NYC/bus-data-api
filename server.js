@@ -139,7 +139,7 @@ function super_ops () {
 					});
 				});
 
-				var start_yr = (new Date().getFullYear().toString() - 1).toString() + "-01-01";
+				var start_yr = (new Date().getFullYear().toString() - 1).toString() + "-01-01"; //<<<<<MODIFIED FOR 2015!!!
 				var end_yr = (new Date()).toISOString().slice(0,10);
 				get_excess_waits_all(start_yr, end_yr, function (err, rows) {
 					if (err) {
@@ -189,7 +189,7 @@ function super_ops () {
 							} else {
 								return_obj["stops"].push(rows);
 
-								var start_yr = new Date().getFullYear().toString() + "-01-01";
+								var start_yr = (new Date().getFullYear().toString() - 1).toString() + "-01-01"; //<<<<<MODIFIED FOR 2015!!!
 								var end_yr = (new Date()).toISOString().slice(0,10);
 								get_headway_comparison(route_id, start_yr, end_yr, function (err, row) {
 									if (err) {
