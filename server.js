@@ -162,6 +162,10 @@ function super_ops () {
 		});
 	});
 
+	app.get("/range_performance", function (req, res) {
+		res.status(200).render("range_performance");
+	});
+
 	app.get("/about", function (req, res) {
 		res.status(200).render("about");
 	});
