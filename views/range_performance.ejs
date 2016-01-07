@@ -1,0 +1,156 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" >
+  <head>
+    <meta charset="utf-8" />
+
+    <title>NYC Bus Transit Data</title>
+
+    <link rel="icon" href="/favicon.ico" type="image/icon">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+
+    <style type="text/css">
+    	.bus-lapel {
+    		line-height: 3;
+    		padding: 10px;
+    		font-size: 1em;
+    		cursor: pointer;
+		    -webkit-transition: all 200ms ease-o
+		    -ms-transition: all 200ms ease-out;
+		    -moz-transition: all 200ms ease-out;
+		    transition: all 200ms ease-out;
+    	}
+    	.bus-lapel:not(:last-child) {
+    		margin-right: 5px;
+    	}
+			.dev-access:hover, .bus-lapel:hover {
+				box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+		    animation: pulse 2s ease infinite;
+			}
+
+			@keyframes pulse {
+			  0% { transform: scale(1); }
+			  50% { transform: scale(1.05); }
+			  100% { transform: scale(1); }
+			}
+
+    	.twitter-typeahead {
+    		float: left;
+    		width: 100%;
+    	}
+			.tt-menu {
+			  width: 100px;
+			  padding: 8px 0;
+			  background-color: #fff;
+			  border: 1px solid #ccc;
+			  border: 1px solid rgba(0, 0, 0, 0.2);
+			  -webkit-border-radius: 3px;
+			     -moz-border-radius: 3px;
+			          border-radius: 3px;
+			  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+			}
+			.tt-suggestion {
+			  padding: 3px 10px;
+			}
+			.tt-suggestion:hover {
+			  cursor: pointer;
+			  color: #fff;
+			  background-color: #0097cf;
+			}
+			.tt-suggestion.tt-cursor {
+			  color: #fff;
+			  background-color: #0097cf;
+			}
+			.tt-suggestion p {
+			  margin: 0;
+			}
+			td, th {
+				padding-right: 10px;
+			}
+			.infobox {
+				color: #FFF;
+			}
+			.infobox table {
+				/*width: 100%;*/
+			}
+			.infobox .panel-table {
+				height: 300px;
+			}
+			.infobox td {
+				font-size: 3.5em;
+				font-weight: 200;
+			}
+    </style>
+
+  </head>
+  <body>
+
+  	<div class="container" style="margin-top: 20px">
+
+  		<h1>
+  			<b onclick="gohome()" style="cursor:pointer">
+  				Bus Data API
+  			</b> 
+  			<span style="color:grey;font-weight:100">
+  				Foobar
+  			</span>
+
+  			<br>
+  			<small>
+  				<sub>
+  					<span class="glyphicon glyphicon-stop" style="color:#<%= route.route_color %>"></span> 
+  					<a href="/routes/<%= route.route_id %>" class="deco-none">
+  						<%= route.agency_id %> <%= route.route_long_name %> <%= route.route_desc %> 
+  					</a>
+  				</sub>
+  			</small>
+  		</h1>
+
+
+			<h3>
+				Year to date performance
+				<small class="label label-default small pull-right dev-access" 
+								style="color:#FFF; cursor: pointer;"
+								onclick="gocustomperformance()">
+					<span class="glyphicon glyphicon-calendar"></span>
+					Custom Performance Range
+				</small>
+			</h3>
+
+  	</div>
+
+  	<footer class="container alert" style="color:gray;font-weight:200">
+  		<span class="pull-right">
+  			Created by 
+  			<a href="https://twitter.com/britishnathan" style="color:red">Nathan Johnson</a> 
+  			and 
+  			<a href="http://kuanbutts.com/" style="color:red">Kuan Butts</a>.
+  			<a href="/about" style="font-weight:bold">More about this project.</a>
+  			<br>
+		  	<small>
+		  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project
+		  		and <a href="http://betanyc.us/">BetaNYC</a> for supporting civic tech.
+	  			<br>
+	  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
+	  		</small>
+  		</span>
+	  	<br>
+  	</footer>
+
+  </body>
+	<script>
+
+		function gotosplash () {
+			window.location = "http://bus-data-nyc.github.io/";
+		};
+
+	</script>
+</html>
+
+
