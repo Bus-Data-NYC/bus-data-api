@@ -3,3 +3,4 @@ node_modules
 database
 ref_code
 bower_components
+.DS_Store
