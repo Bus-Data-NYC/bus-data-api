@@ -98,16 +98,13 @@
   				Bus Data API
   			</b> 
   			<span style="color:grey;font-weight:100">
-  				Foobar
+  				Performance Analysis Explorer
   			</span>
 
   			<br>
   			<small>
   				<sub>
-  					<span class="glyphicon glyphicon-stop" style="color:#<%= route.route_color %>"></span> 
-  					<a href="/routes/<%= route.route_id %>" class="deco-none">
-  						<%= route.agency_id %> <%= route.route_long_name %> <%= route.route_desc %> 
-  					</a>
+  					Foobar
   				</sub>
   			</small>
   		</h1>
@@ -125,29 +122,13 @@
 
   	</div>
 
-  	<footer class="container alert" style="color:gray;font-weight:200">
-  		<span class="pull-right">
-  			Created by 
-  			<a href="https://twitter.com/britishnathan" style="color:red">Nathan Johnson</a> 
-  			and 
-  			<a href="http://kuanbutts.com/" style="color:red">Kuan Butts</a>.
-  			<a href="/about" style="font-weight:bold">More about this project.</a>
-  			<br>
-		  	<small>
-		  		Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project
-		  		and <a href="http://betanyc.us/">BetaNYC</a> for supporting civic tech.
-	  			<br>
-	  			Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
-	  		</small>
-  		</span>
-	  	<br>
-  	</footer>
+  	<% include ../partials/footer %>
 
   </body>
 	<script>
 
-		function gotosplash () {
-			window.location = "http://bus-data-nyc.github.io/";
+		function gohome () {
+			window.location.pathname = "/";
 		};
 
 	</script>

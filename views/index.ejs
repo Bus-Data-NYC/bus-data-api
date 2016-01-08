@@ -126,7 +126,7 @@
 
 
 			<h3>
-				Year to date performance
+				<span onclick="gocustomperformance()" style="cursor:pointer;">Year to date performance</span>
 				<small class="label label-default small pull-right dev-access" 
 								style="color:#FFF; cursor: pointer;"
 								onclick="gocustomperformance()">
@@ -262,23 +262,7 @@
 
 		</div>
 
-		<footer class="container alert" style="color:gray;font-weight:200">
-			<span class="pull-right">
-				Created by 
-				<a href="https://twitter.com/britishnathan" style="color:red">Nathan Johnson</a> 
-				and 
-				<a href="http://kuanbutts.com/" style="color:red">Kuan Butts</a>.
-				<a href="/about" style="font-weight:bold">More about this project.</a>
-				<br>
-				<small>
-					Special thanks to <a href="https://twitter.com/MicrosoftNY">@MicrosoftNY</a> for hosting this project
-					and <a href="http://betanyc.us/">BetaNYC</a> for supporting civic tech.
-					<br>
-					Disclaimer: All information provided without warranty of any kind. Have a nice day. :)
-				</small>
-			</span>
-			<br>
-		</footer>
+		<% include ../partials/footer %>
 
 	</body>
 	<script>
