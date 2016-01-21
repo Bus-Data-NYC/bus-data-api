@@ -531,13 +531,24 @@ function super_ops () {
 
 	// QUERY UTILITIES
 
-	function get_routes_all (cb) {
+	function base_routes_metadata_query (anchor_date, route_id) {
+		if (typeof anchor_date == 'undefined' || !anchor_date) anchor_date = (new Date()).toISOString().slice(0,10);
 		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
-						"FROM routes_current ORDER BY LEFT(route_id, 1), SUBSTR(route_id, 2, 99) + 0, route_id";
+						"FROM routes INNER JOIN agency ON routes.agency_index = agency.agency_index " +
+						"WHERE agency.feed_index IN (SELECT feeds.feed_index FROM feeds " + 
+							"WHERE feeds.feed_start_date <= '" + anchor_date + "' " + 
+							"AND feeds.feed_end_date >= '" + anchor_date + "') ";
+		if (typeof route_id == 'string') q = q + " AND route_id = '" + route_id + "' ";
+		return q;
+	};
+
+	function get_routes_all (cb) {
+		var q = base_routes_metadata_query() + "GROUP BY route_id;";
 		handle_database(q, cb);
 	};
 
 	function get_specific_route (route_id, cb) {
+		var q = base_routes_metadata_query() + "GROUP BY route_id;";
 		var q1 =  "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
 							"FROM routes_current WHERE route_id = '" + route_id + "' LIMIT 1;";
 		handle_database(q1, function (err, rows) {
