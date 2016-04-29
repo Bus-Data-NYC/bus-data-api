@@ -54,31 +54,33 @@ function super_ops () {
 				// now attach to local sqlite3 user accounts
 				sqlite3 = require('sqlite3').verbose();
 				usersDB = new sqlite3.Database('database/users.db');
-				usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT);", function () {
-					var q = "PRAGMA table_info(users)";
-					usersDB.all(q, function (err, res) {
-						if (err) {
-							console.log("Server failed to start, SQLITE3 database errors occurred.");
-						} else {
-							var schemaBad = false;
-							res.map(function (ea) { return {type: ea.type, name: ea.name }; });
-							res.forEach(function (ea) { if (ea.type !== "TEXT") { schemaBad = true; } });
-
-							var reference = ["email", "xp", "token", "organization", "last_req"];
-							res.forEach(function (ea, i) { if (reference[i] !== ea.name) { schemaBad = true; } });
-
-							// designed to only handle old pw col name issue
-							if (schemaBad) {
-								usersDB.serialize(function() {
-								  usersDB.run("ALTER TABLE users RENAME TO users_temp;");
-								  usersDB.run("CREATE TABLE users (email TEXT, xp TEXT, token TEXT, organization TEXT, last_req TEXT);");
-							    usersDB.run("INSERT INTO users(email, xp, token, organization, last_req) SELECT email, password, token, organization, last_req FROM users_temp;");
-							    usersDB.run("DROP TABLE users_temp;", function () { startServer(); });
-								});
+				usersDB.run("CREATE TABLE if not exists activity (who TEXT, api INTEGER, path TEXT);", function () {
+					usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT);", function () {
+						var q = "PRAGMA table_info(users)";
+						usersDB.all(q, function (err, res) {
+							if (err) {
+								console.log("Server failed to start, SQLITE3 database errors occurred.");
 							} else {
-								startServer();
+								var schemaBad = false;
+								res.map(function (ea) { return {type: ea.type, name: ea.name }; });
+								res.forEach(function (ea) { if (ea.type !== "TEXT") { schemaBad = true; } });
+
+								var reference = ["email", "xp", "token", "organization", "last_req"];
+								res.forEach(function (ea, i) { if (reference[i] !== ea.name) { schemaBad = true; } });
+
+								// designed to only handle old pw col name issue
+								if (schemaBad) {
+									usersDB.serialize(function() {
+									  usersDB.run("ALTER TABLE users RENAME TO users_temp;");
+									  usersDB.run("CREATE TABLE users (email TEXT, xp TEXT, token TEXT, organization TEXT, last_req TEXT);");
+								    usersDB.run("INSERT INTO users(email, xp, token, organization, last_req) SELECT email, password, token, organization, last_req FROM users_temp;");
+								    usersDB.run("DROP TABLE users_temp;", function () { startServer(); });
+									});
+								} else {
+									startServer();
+								}
 							}
-						}
+						});
 					});
 				});
 			}
@@ -87,7 +89,7 @@ function super_ops () {
 
 
 	// pool manager for mysql connections
-	function handle_database (query, cb) {console.log(query);
+	function handle_database (query, cb) {
 		pool.getConnection(function (err, connection) {
 			if (err) {
 				connection.release();
@@ -106,6 +108,19 @@ function super_ops () {
 		});
 	};
 
+
+	// log queries and access attempts each time
+	app.use(function (req, res, next){
+		var path = req.url;
+		var who = "public", api = 0;
+		if (path.split("/")[1] !== "api") {
+			var q2 = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "');";
+			usersDB.run(q2, function (err, row) {
+				if (err) { console.log(err); } 
+				next();
+			});
+		} else { next(); }
+	});
 
 	// VIEWS
 	app.get('/', function(req, res) {
@@ -383,7 +398,7 @@ function super_ops () {
 	var router = express.Router(); 
 
 	// middleware for all api requests, check for token
-	router.use(function(req, res, next) {
+	router.use(function (req, res, next) {
 		var token, inHeader = false, asToken = false;
 		if (req.hasOwnProperty("headers") && req.headers.hasOwnProperty("token")) {
 			inHeader = true;
@@ -393,20 +408,27 @@ function super_ops () {
 			token = req.query.token;
 		}
 		if (inHeader || asToken) {
-			var q1 = "SELECT * FROM users WHERE token = '" + token + "';";
+			var q1 = "SELECT rowid, * FROM users WHERE token = '" + token + "';";
 			usersDB.get(q1, function (err, row) {
 				if (err) {
 					res.status(500).send(err);
 				} else {
 					if (row) {
-						var q2 = "UPDATE users SET last_req = '" + Date.now() + "' WHERE token = '" + token + "';"
-						usersDB.run(q2, function (err, row) {
-							if (err) {
-								res.status(500).send(err);
-							} else {
-								next();
+
+						var path = req.url, who = row.rowid, api = 1;
+						try { path = path.split("?")[0] } catch (e) {}
+						var qLog = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "');";
+						usersDB.run(qLog, function (err, row) {
+							if (err) { res.status(500).send(err); } 
+							else {
+								var q2 = "UPDATE users SET last_req = '" + Date.now() + "' WHERE token = '" + token + "';"
+								usersDB.run(q2, function (err, row) {
+									if (err) { res.status(500).send(err); } 
+									else { next(); }
+								});
 							}
 						});
+
 					} else {
 						res.status(404).send("Token not found.");
 					}
