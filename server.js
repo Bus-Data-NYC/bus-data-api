@@ -393,8 +393,44 @@ function super_ops () {
 		});
 	});
 
-	app.get("/use", function (req, res) {
+	app.get("/use/api", function (req, res) {
 		var query = "SELECT * FROM activity WHERE api='1' ORDER BY date DESC;";
+		usersDB.all(query, function (err, rows) {
+			if (err) { res.status(500).send(err); } 
+			else { 
+				var html = "<html><body><ul>";
+				try { 
+					rows.forEach(function (ea) { 
+						ea.date = Number(ea.date);
+						html = html + "<li> User " + ea.who + ": " + ea.path + " on " + new Date(ea.date).toISOString().split("T")[0] + "</li>"; 
+					});
+				} catch (e) { console.log(e); }
+				html += "</ul></body>";
+				res.status(200).send(html); 
+			}
+		});
+	});
+
+	app.get("/use/public", function (req, res) {
+		var query = "SELECT * FROM activity WHERE api='0' ORDER BY date DESC;";
+		usersDB.all(query, function (err, rows) {
+			if (err) { res.status(500).send(err); } 
+			else { 
+				var html = "<html><body><ul>";
+				try { 
+					rows.forEach(function (ea) { 
+						ea.date = Number(ea.date);
+						html = html + "<li> User " + ea.who + ": " + ea.path + " on " + new Date(ea.date).toISOString().split("T")[0] + "</li>"; 
+					});
+				} catch (e) { console.log(e); }
+				html += "</ul></body>";
+				res.status(200).send(html); 
+			}
+		});
+	});
+
+	app.get("/use/all", function (req, res) {
+		var query = "SELECT * FROM activity ORDER BY date DESC;";
 		usersDB.all(query, function (err, rows) {
 			if (err) { res.status(500).send(err); } 
 			else { 
