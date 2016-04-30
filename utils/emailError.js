@@ -17,10 +17,8 @@ var emailUser = function (credentials, errText, recipient, cb) {
 	    text: "",
 	    html: ""
 		};
-		var time = new Date(Date.now()).toUTCString(),
-				introPhrase = '<b>[Password Request] </b> Your password was requested at ' + time + ': <br>';
 		mailOptions.to = recipient;
-		mailOptions.html = mailOptions.text = [introPhrase, errText].join(' ');
+		mailOptions.html = mailOptions.text = errText;
 		transporter.sendMail(mailOptions, function (error, info) {
 		  if (error) console.log(error, info);
 		  if (cb !== undefined) cb();

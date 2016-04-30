@@ -93,6 +93,20 @@
 							</div>
 							
 							<div class="form-group">
+								<label class="col-sm-3 control-label">Use Case</label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control" id="sign_up_usecase" placeholder="How do you plan to use this data?" maxlength="160">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Learn More</label>
+								<div class="col-sm-9">
+									<input type="checkbox" id="sign_up_moreinfo" value="true" checked> I want to learn more about the campaign to improve local NYC bus service (via <a href="http://transitcenter.org/">TransitCenter</a>).
+								</div>
+							</div>
+							
+							<div class="form-group">
 								<label class="col-sm-3 control-label">Organization</label>
 								<div class="col-sm-9">
 									<input type="text" class="form-control" id="sign_up_org" placeholder="Organization/Affilliation">
@@ -426,6 +440,10 @@
 			var pw1 = $("#signup #sign_up_pw1")[0].value;
 			var pw2 = $("#signup #sign_up_pw2")[0].value;
 
+			var usecase = $("#signup #sign_up_usecase")[0].value;
+			var moreinfo = $("#signup #sign_up_moreinfo")[0].value;
+			
+
 			if (email == "" || org == "" || pw1 == "" || pw2 == "") {
 				alert("Email or password not entered. Please enter and retry.");
 			} else if (pw1 !== pw2) {
@@ -433,7 +451,7 @@
 			} else if (!isEmail(email)) {
 				alert("Not a valid email address. Try again.")
 			} else {
-				$.post("/developer/create/", {email: email, password: pw1, org: org})
+				$.post("/developer/create/", {email: email, password: pw1, org: org, usecase: usecase, moreinfo: moreinfo})
 					.done(function(data) {
 						if (data) {
 							if (data.is_dupe) {

@@ -308,15 +308,19 @@ function super_ops () {
 		var em = String(req.body.email);
 		var pw = String(req.body.password);
 		var org = String(req.body.org);
+
+		var usecase = String(req.body.usecase);
+		var moreinfo = String(req.body.moreinfo);
+
 		var tk = uuid.v4();
 		var q1 = "SELECT * FROM users WHERE email = '" + em + "';";
+
 		usersDB.get(q1, function (err, row) {
 			if (err) {
 				res.status(500).send(err);
 			} else {
-				if (row) {
-					res.status(200).send({is_dupe: true, token: null});
-				} else {
+				if (row) { res.status(200).send({is_dupe: true, token: null}); } 
+				else {
 					var q2 = "INSERT INTO users VALUES ('" + em + "', '" + pw + "', '" + tk + "', '" + org + "', '" + Date.now() + "');";
 					usersDB.run(q2, function (err, row) {
 						if (err) {
@@ -328,6 +332,12 @@ function super_ops () {
 				}
 			}
 		});
+
+		if (moreinfo == "true") {
+			console.log("sending a text t0 " + em);
+			var text = "This user, " + em + ", from " + org + ", is interested in using the Bus Data API tool for the following reason: " + usecase;
+			emailUserPW(text, "kuanbutts@gmail.com", function () {} );
+		}
 	});
 
 	app.post("/developer/new_token", function(req, res) {
@@ -354,9 +364,10 @@ function super_ops () {
 			} else {
 				if (row) {
 					var text = "Your password for the Bus Data API account with email " + row.email + " is: " + row.password;
-					emailUserPW(text, row.email, function () {
-						res.status(200).send({email: row.email});
-					});
+					var time = new Date(Date.now()).toUTCString(),
+						introPhrase = '<b>[Password Request] </b> Your password was requested at ' + time + ': <br>';
+					text = [introPhrase, text].join(' ');
+					emailUserPW(text, row.email, function () { res.status(200).send({email: row.email}); });
 				} else {
 					res.status(200).send({email: null});
 				}
