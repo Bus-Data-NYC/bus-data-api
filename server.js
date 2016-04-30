@@ -54,7 +54,7 @@ function super_ops () {
 				// now attach to local sqlite3 user accounts
 				sqlite3 = require('sqlite3').verbose();
 				usersDB = new sqlite3.Database('database/users.db');
-				usersDB.run("CREATE TABLE if not exists activity (who TEXT, api INTEGER, path TEXT);", function () {
+				usersDB.run("CREATE TABLE if not exists activity (who TEXT, api INTEGER, path TEXT, date TEXT);", function () {
 					usersDB.run("CREATE TABLE if not exists users (email TEXT, password TEXT, token TEXT, organization TEXT, last_req TEXT);", function () {
 						var q = "PRAGMA table_info(users)";
 						usersDB.all(q, function (err, res) {
@@ -114,7 +114,7 @@ function super_ops () {
 		var path = req.url;
 		var who = "public", api = 0;
 		if (path.split("/")[1] !== "api") {
-			var q2 = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "');";
+			var q2 = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "', '" + Date.now() + "');";
 			usersDB.run(q2, function (err, row) {
 				if (err) { console.log(err); } 
 				next();
@@ -378,7 +378,7 @@ function super_ops () {
 		});
 	});
 
-	app.get("/developer/account/:email/:password", function(req, res) {
+	app.get("/developer/account/:email/:password", function (req, res) {
 		var em = String(req.params.email);
 		var pw = String(req.params.password);
 		var query = "SELECT * FROM users WHERE email = '" + em + "' and xp = '" + pw + "';";
@@ -389,6 +389,24 @@ function super_ops () {
 				row.password = Array(row.xp.length + 1).join("*");
 				delete row.xp;
 				res.status(200).send(row)
+			}
+		});
+	});
+
+	app.get("/use", function (req, res) {
+		var query = "SELECT * FROM activity WHERE api='1' ORDER BY date DESC;";
+		usersDB.all(query, function (err, rows) {
+			if (err) { res.status(500).send(err); } 
+			else { 
+				var html = "<html><body><ul>";
+				try { 
+					rows.forEach(function (ea) { 
+						ea.date = Number(ea.date);
+						html = html + "<li> User " + ea.who + ": " + ea.path + " on " + new Date(ea.date).toISOString().split("T")[0] + "</li>"; 
+					});
+				} catch (e) { console.log(e); }
+				html += "</ul></body>";
+				res.status(200).send(html); 
 			}
 		});
 	});
@@ -417,7 +435,7 @@ function super_ops () {
 
 						var path = req.url, who = row.rowid, api = 1;
 						try { path = path.split("?")[0] } catch (e) {}
-						var qLog = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "');";
+						var qLog = "INSERT INTO activity VALUES ('" + who + "', '" + api + "', '" + path + "', '" + Date.now() + "');";
 						usersDB.run(qLog, function (err, row) {
 							if (err) { res.status(500).send(err); } 
 							else {
