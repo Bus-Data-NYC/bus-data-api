@@ -619,7 +619,11 @@ function super_ops () {
 	// QUERY UTILITIES
 
 	function base_routes_metadata_query (anchor_date, route_id) {
-		if (typeof anchor_date == 'undefined' || !anchor_date) anchor_date = (new Date()).toISOString().slice(0,10);
+		if (typeof anchor_date == 'undefined' || !anchor_date) { 
+			anchor_date = "2015" + new Date().toISOString().slice(4,10);  //<<<<<MODIFIED FOR 2015!!!
+			// new Date().toISOString().slice(0,10);
+		}
+
 		var q = "SELECT route_id, agency_id, route_short_name, route_long_name, route_desc, route_url, route_color, route_text_color " + 
 						"FROM routes INNER JOIN agency ON routes.agency_index = agency.agency_index " +
 						"WHERE agency.feed_index IN (SELECT feeds.feed_index FROM feeds " + 
