@@ -333,11 +333,10 @@ function super_ops () {
 			}
 		});
 
-		
-			console.log("sending a text t0 " + em);
 			var text = "This user, " + em + ", from " + org + ", is interested in using the Bus Data API tool for the following reason: " + usecase;
 			if (moreinfo == "true") { text = text + " \n \n The user is also interested in hearing more information on the campaign to improve local bus service in NYC." }
 			emailUserPW(text, "kuanbutts@gmail.com", function () {} );
+			emailUserPW(text, "zaccuardi@transitcenter.org", function () {} );
 	});
 
 	app.post("/developer/new_token", function(req, res) {
