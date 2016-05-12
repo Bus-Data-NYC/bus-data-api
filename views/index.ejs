@@ -154,7 +154,8 @@
 									</tr>
 									<% for (var i = 0; i < Math.round(excess.length/2) + 1; i++) { %>
 										
-										<% if (Number(excess[i].sched_pickups) > 55000) { %>
+										<% var idOK_1 = excess[i].route_id.indexOf("BM") !== 0 && excess[i].route_id.indexOf("QM") !== 0 && excess[i].route_id.indexOf("X") !== 0 %>
+										<% if (Number(excess[i].sched_pickups) > 55000 && idOK_1) { %>
 											<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
 												<td>
 													<b><%= excess[i].route_id %></b>
@@ -200,7 +201,8 @@
 									</tr>
 									<% for (var i = (excess.length - 1); i > Math.round(excess.length/2) - 1; i--) { %>
 
-										<% if (Number(excess[i].sched_pickups) > 55000) { %>
+										<% var idOK_2 = excess[i].route_id.indexOf("BM") !== 0 && excess[i].route_id.indexOf("QM") !== 0 && excess[i].route_id.indexOf("X") !== 0 %>
+										<% if (Number(excess[i].sched_pickups) > 55000 && idOK_2) { %>
 											<tr onclick="gotoroute('<%= excess[i].route_id %>')" style="cursor:pointer">
 												<td>
 													<b><%= excess[i].route_id %></b>
@@ -280,6 +282,7 @@
 
 	</body>
 	<script>
+
 		// Globals
 		var routes = [];
 
