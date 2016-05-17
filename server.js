@@ -138,6 +138,7 @@ function super_ops () {
 					else if (boro.indexOf("Q") > -1) boro = "Queens";
 					else if (boro.indexOf("S") > -1) boro = "Staten Island";
 					else if (boro.indexOf("B") > -1) boro = "Brooklyn";
+					else if (boro[0] == "X") boro = "Cross Town";
 					
 					if (routes[boro] == undefined) routes[boro] = [];
 					routes[boro].push(route);
